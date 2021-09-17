@@ -6,7 +6,7 @@ Syntax highlighted code block
 ## Header 2
 ### Header 3
 
-- [Verse](./app/index.html)
+
 - List
 
 1. Numbered
