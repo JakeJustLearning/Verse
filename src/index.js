@@ -19,12 +19,12 @@ const init = async () => {
 
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(
-    45,
+    70,
     window.innerWidth / window.innerHeight,
     .01,
-    50
+    20
   )
-  camera.position.set(0, 1.6, 3)
+  // camera.position.set(0, 1.6, 3)
 
   function resize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -47,7 +47,7 @@ const init = async () => {
 
   reticle = new THREE.Mesh(
     new THREE.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
-    new THREE.MeshBasicMaterial()
+    new THREE.MeshBasicMaterial({ color: 'green' })
   )
   reticle.matrixAutoUpdate = false
   reticle.visible = false
@@ -116,7 +116,37 @@ function animate() {
   renderer.setAnimationLoop(render)
 }
 function render(timestamp, frame) {
-  runHitTest(renderer, timestamp, frame, reticle)
+  // runHitTest(renderer, timestamp, frame, reticle)
+  if (frame) {
+    const referenceSpace = renderer.xr.getReferenceSpace()
+    const session = renderer.xr.getSession()
+
+    if (hitTestSourceRequested === false) {
+      session.requestReferenceSpace('viewer')
+        .then(referenceSpace => {
+          session.requestHitTestSource({ space: referenceSpace })
+            .then(source => {
+              hitTestSource = source
+            })
+        })
+      session.addEventListener('end', function () {
+        hitTestSourceRequested = false
+        hitTestSource = null
+      })
+      hitTestSourceRequested = true
+    }
+    if (hitTestSource) {
+      const hitTestResults = frame.getHitTestResults(hitTestSource);
+      if (hitTestResults.length) {
+        const hit = hitTestResults[0]
+
+        reticle.visible = true
+        reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
+      } else {
+        reticle.visbile = false
+      }
+    }
+  }
   renderer.render(scene, camera)
 }
 

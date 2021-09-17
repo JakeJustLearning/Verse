@@ -225,6 +225,14 @@ renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.xr.enabled = true
 
+renderer.hitTesting = false
+
+runHitTest = (remderer, timestamp, frame) => {
+  if (frame) {
+    const referenceSpace = renderer.xr.getReferenceSpace()
+    const session = renderer.xr.getSession()
+  }
+}
 
 
 
@@ -54857,12 +54865,12 @@ const init = async () => {
 
   scene = new three__WEBPACK_IMPORTED_MODULE_3__.Scene()
   camera = new three__WEBPACK_IMPORTED_MODULE_3__.PerspectiveCamera(
-    45,
+    70,
     window.innerWidth / window.innerHeight,
     .01,
-    50
+    20
   )
-  camera.position.set(0, 1.6, 3)
+  // camera.position.set(0, 1.6, 3)
 
   function resize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -54885,7 +54893,7 @@ const init = async () => {
 
   reticle = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
     new three__WEBPACK_IMPORTED_MODULE_3__.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
-    new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial()
+    new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({ color: 'green' })
   )
   reticle.matrixAutoUpdate = false
   reticle.visible = false
@@ -54954,7 +54962,37 @@ function animate() {
   _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].setAnimationLoop(render)
 }
 function render(timestamp, frame) {
-  runHitTest(_renderer__WEBPACK_IMPORTED_MODULE_1__["default"], timestamp, frame, reticle)
+  // runHitTest(renderer, timestamp, frame, reticle)
+  if (frame) {
+    const referenceSpace = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getReferenceSpace()
+    const session = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getSession()
+
+    if (hitTestSourceRequested === false) {
+      session.requestReferenceSpace('viewer')
+        .then(referenceSpace => {
+          session.requestHitTestSource({ space: referenceSpace })
+            .then(source => {
+              hitTestSource = source
+            })
+        })
+      session.addEventListener('end', function () {
+        hitTestSourceRequested = false
+        hitTestSource = null
+      })
+      hitTestSourceRequested = true
+    }
+    if (hitTestSource) {
+      const hitTestResults = frame.getHitTestResults(hitTestSource);
+      if (hitTestResults.length) {
+        const hit = hitTestResults[0]
+
+        reticle.visible = true
+        reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
+      } else {
+        reticle.visbile = false
+      }
+    }
+  }
   _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].render(scene, camera)
 }
 
