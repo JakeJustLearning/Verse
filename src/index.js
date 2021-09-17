@@ -31,7 +31,7 @@ const init = async () => {
 
   window.addEventListener('resize', resize())
 
-  const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltff')
+  const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
   const geometry = new THREE.BoxGeometry()
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
 

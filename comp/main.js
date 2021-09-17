@@ -54865,7 +54865,7 @@ const init = async () => {
 
   window.addEventListener('resize', resize())
 
-  const wolf = await (0,_loader__WEBPACK_IMPORTED_MODULE_2__.loadGLTF)('./assets/wolf_gltf/Wolf-Blender-2.82a.gltff')
+  const wolf = await (0,_loader__WEBPACK_IMPORTED_MODULE_2__.loadGLTF)('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
   const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BoxGeometry()
   const material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({ color: 0x00ff00 })
 
