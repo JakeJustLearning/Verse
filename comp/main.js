@@ -225,6 +225,10 @@ renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.xr.enabled = true
 
+
+
+
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (renderer);
 
 /***/ }),
@@ -54838,9 +54842,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 console.log('wee')
-let container
-let scene
-let camera
+let container;
+let scene;
+let camera;
+let reticle;
+let hitTestSource = null
+let hitTestSourceRequested = false
 
 const init = async () => {
   container = document.createElement('div');
@@ -54855,7 +54862,7 @@ const init = async () => {
     .01,
     50
   )
-
+  camera.position.set(0, 1.6, 3)
 
   function resize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -54865,20 +54872,39 @@ const init = async () => {
 
   window.addEventListener('resize', resize())
 
-  const wolf = await (0,_loader__WEBPACK_IMPORTED_MODULE_2__.loadGLTF)('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
-  const geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BoxGeometry()
-  const material = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({ color: 0x00ff00 })
+  const controller = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getController(0)
+  controller.addEventListener('select', onSelect)
 
-  const cube = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(geometry, material)
-  cube.position.set(0)
+  function onSelect() {
+    if (reticle.visible) {
+      const wolfClone = wolf.clone()
+      wolfClone.position.set.FromMatrixPosition(reticle.matrix)
+      scene.add(wolfClone)
+    }
+  }
+
+  reticle = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
+    new three__WEBPACK_IMPORTED_MODULE_3__.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
+    new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial()
+  )
+  reticle.matrixAutoUpdate = false
+  reticle.visible = false
+  scene.add(reticle)
+
+
+  const wolf = await (0,_loader__WEBPACK_IMPORTED_MODULE_2__.loadGLTF)('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
+
+  // const geometry = new THREE.BoxGeometry()
+  // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+
+  // const cube = new THREE.Mesh(geometry, material)
+  // cube.position.set(0)
+  // scene.add(cube)
   const light = new three__WEBPACK_IMPORTED_MODULE_3__.HemisphereLight(0xffffbb, 0x080820, 1)
   light.position.set(0.5, 1, 0.25)
 
-  scene.add(cube)
   scene.add(light)
-  scene.add(wolf)
 
-  camera.position.z = 5
 
   container.appendChild(_renderer__WEBPACK_IMPORTED_MODULE_1__["default"].domElement)
 
@@ -54890,10 +54916,45 @@ const init = async () => {
 
 }
 
+const runHitTest = (renderer, timestamp, frame, reticle) => {
+  if (frame) {
+    const referenceSpace = renderer.xr.getReferenceSpace()
+    const session = renderer.xr.getSession()
+
+    if (hitTestSourceRequested === false) {
+      session.requestReferenceSpace('viewer')
+        .then(referenceSpace => {
+          session.requestHitTestSource({ space: referenceSpace })
+            .then(source => {
+              hitTestSource = source
+            })
+        })
+      session.addEventListener('end', function () {
+        hitTestSourceRequested = false
+        hitTestSource = null
+      })
+      hitTestSourceRequested = true
+    }
+    if (hitTestSource) {
+      const hitTestResults = frame.getHitTestResults(hitTestSource);
+      if (hitTestResults.length) {
+        const hit = hitTestResults[0]
+
+        reticle.visible = true
+        reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
+      } else {
+        reticle.visbile = false
+      }
+    }
+  }
+}
+
+
 function animate() {
   _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].setAnimationLoop(render)
 }
-function render() {
+function render(timestamp, frame) {
+  runHitTest(_renderer__WEBPACK_IMPORTED_MODULE_1__["default"], timestamp, frame, reticle)
   _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].render(scene, camera)
 }
 
