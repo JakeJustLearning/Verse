@@ -225,14 +225,14 @@ renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.xr.enabled = true
 
-renderer.hitTesting = false
+// renderer.hitTesting = false
 
-runHitTest = (remderer, timestamp, frame) => {
-  if (frame) {
-    const referenceSpace = renderer.xr.getReferenceSpace()
-    const session = renderer.xr.getSession()
-  }
-}
+// runHitTest = (remderer, timestamp, frame) => {
+//   if (frame) {
+//     const referenceSpace = renderer.xr.getReferenceSpace()
+//     const session = renderer.xr.getSession()
+//   }
+// }
 
 
 
@@ -54921,7 +54921,6 @@ const init = async () => {
       root: document.body
     }
   }))
-
 }
 
 // const runHitTest = (renderer, timestamp, frame, reticle) => {

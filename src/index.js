@@ -75,7 +75,6 @@ const init = async () => {
       root: document.body
     }
   }))
-
 }
 
 // const runHitTest = (renderer, timestamp, frame, reticle) => {
