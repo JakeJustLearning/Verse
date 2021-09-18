@@ -54885,9 +54885,10 @@ const init = async () => {
 
   function onSelect() {
     if (reticle.visible) {
-      const wolfClone = wolf.clone()
+      const wolfClone = wolf
       wolfClone.position.setFromMatrixPosition(reticle.matrix)
       scene.add(wolfClone)
+      wolfClone.visible = true
     }
   }
 
