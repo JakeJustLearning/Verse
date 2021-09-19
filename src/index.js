@@ -40,8 +40,7 @@ const init = async () => {
   function onSelect() {
     if (reticle.visible) {
       wolf.position.setFromMatrixPosition(reticle.matrix)
-      scene.add(wolf)
-      scene.add(earth)
+      wolf.visible = true
     }
   }
 
@@ -55,8 +54,8 @@ const init = async () => {
 
 
   const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
-  const earth = await loadGLTF('./assets/earth/eart_moon.gltf')
-  earth.position.set(0, 0, -2)
+  wolf.visible = false
+  scene.add(wolf)
 
 
   // const geometry = new THREE.BoxGeometry()
