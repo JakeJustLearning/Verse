@@ -54867,7 +54867,7 @@ const checkIntersections = (screenPos) => {
   selectRay.setFromCamera(screenPos, camera)
   const intersects = selectRay.intersectObjects(scene.children)
   for (let i = 0; i < intersects.length; i++) {
-    intersects[i].object.scale(1.5, 1.5)
+    intersects[i].object.geometry.scale(1.5, 1.5, 1.5)
   }
 }
 
@@ -54907,10 +54907,9 @@ const init = async () => {
 
 
   function onSelect() {
-    const touch = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2()
-    touch.x = controller.position.x * 20
-    touch.y = controller.position.y * 10
+    const touch = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2(0, 0)
     checkIntersections(touch)
+
 
     // const controllerPosition = new THREE.Vector3()
     // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
@@ -55015,6 +55014,7 @@ function animate() {
   _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].setAnimationLoop(render)
 }
 function render(timestamp, frame) {
+
   // runHitTest(renderer, timestamp, frame, reticle)
   if (frame) {
     const referenceSpace = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getReferenceSpace()
