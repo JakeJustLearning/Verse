@@ -54853,9 +54853,23 @@ console.log('wee')
 let container;
 let scene;
 let camera;
+let controller;
 let reticle;
 let hitTestSource = null
 let hitTestSourceRequested = false
+
+const selectRay = new three__WEBPACK_IMPORTED_MODULE_3__.Raycaster()
+
+const checkIntersections = (screenPos) => {
+  // console.log('looking for intersection')
+
+
+  selectRay.setFromCamera(screenPos, camera)
+  const intersects = selectRay.intersectObjects(scene.children)
+  for (let i = 0; i < intersects.length; i++) {
+    intersects[i].object.scale(1.5, 1.5)
+  }
+}
 
 const init = async () => {
   container = document.createElement('div');
@@ -54880,14 +54894,28 @@ const init = async () => {
 
   window.addEventListener('resize', resize())
 
-  const controller = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getController(0)
+  controller = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getController(0)
   controller.addEventListener('select', onSelect)
 
+  // function onSelect() {
+  //   if (reticle.visible) {
+  //     wolf.position.setFromMatrixPosition(reticle.matrix)
+  //     wolf.visible = true
+  //   }
+  // }
+
+
+
   function onSelect() {
-    if (reticle.visible) {
-      wolf.position.setFromMatrixPosition(reticle.matrix)
-      wolf.visible = true
-    }
+    const touch = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2()
+    touch.x = controller.position.x * 20
+    touch.y = controller.position.y * 10
+    checkIntersections(touch)
+
+    // const controllerPosition = new THREE.Vector3()
+    // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
+    // console.log(controllerPosition)
+
   }
 
   reticle = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
@@ -54898,10 +54926,34 @@ const init = async () => {
   reticle.visible = false
   scene.add(reticle)
 
+  const boxGeo = new three__WEBPACK_IMPORTED_MODULE_3__.BoxGeometry(.3, .3, .3)
+  const boxMesh = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
 
-  const wolf = await (0,_loader__WEBPACK_IMPORTED_MODULE_2__.loadGLTF)('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
-  wolf.visible = false
-  scene.add(wolf)
+  const boxOne = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
+    boxGeo,
+    boxMesh
+  )
+  boxOne.position.set(1, 1, - 1)
+
+  const boxTwo = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
+    boxGeo,
+    boxMesh
+  )
+  boxTwo.position.set(0, 1, - 1)
+
+  const boxThree = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
+    boxGeo,
+    boxMesh
+  )
+  boxThree.position.set(1, 1, - 1)
+
+
+  scene.add(boxOne)
+  scene.add(boxTwo)
+  scene.add(boxThree)
+  // const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
+  // wolf.visible = false
+  // scene.add(wolf)
 
 
   // const geometry = new THREE.BoxGeometry()
