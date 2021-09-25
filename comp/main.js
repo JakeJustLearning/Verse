@@ -3,7 +3,7 @@
 /******/ 	var __webpack_modules__ = ([
 /* 0 */,
 /* 1 */
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -57,7 +57,7 @@ class ARButton {
 
 			let currentSession = null;
 
-			async function onSessionStarted( session ) {
+			async function onSessionStarted( session, onStartCallback ) {
 
 				session.addEventListener( 'end', onSessionEnded );
 
@@ -69,7 +69,7 @@ class ARButton {
 				sessionInit.domOverlay.root.style.display = '';
 
 				currentSession = session;
-
+				if(onStartCallback) onStartCallback(currentSession)
 			}
 
 			function onSessionEnded( /*event*/ ) {
@@ -109,7 +109,7 @@ class ARButton {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( session => onSessionStarted(session,sessionInit.onStartCallback));
 
 				} else {
 
@@ -54779,6 +54779,122 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 
 
+/***/ }),
+/* 6 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getTargetRaySpace": () => (/* binding */ getTargetRaySpace),
+/* harmony export */   "getTargetRayPose": () => (/* binding */ getTargetRayPose),
+/* harmony export */   "getTargetRayOrigin": () => (/* binding */ getTargetRayOrigin),
+/* harmony export */   "getTargetRayDirection": () => (/* binding */ getTargetRayDirection),
+/* harmony export */   "requestTargetRayInfo": () => (/* binding */ requestTargetRayInfo)
+/* harmony export */ });
+// help get target ray space information to be used for three.js rayscanner and intersection detection
+
+
+const getTargetRaySpace = (event) => {
+  return event.data[Object.getOwnPropertySymbols(event.data)[0]].targetRaySpaces
+}
+
+const getTargetRayPose = (frame, targetRaySpaces) => {
+  const viewerRefSpace = frame.session.requestReferenceSpace('viewer')
+  return frame.session.getPose(targetRaySpaces, viewerRefSpace)
+}
+
+const getTargetRayOrigin = (targetRayPose) => targetRayPose.transform.position
+const getTargetRayDirection = (targetRayPose) => targetRayPose.transform.orientation
+
+const requestTargetRayInfo = (event, frame) => {
+  const rayPose = getTargetRayPose(frame, getTargetRaySpace(event))
+  return { rayOrigin: getTargetRayOrigin(rayPose), rayDirection: getTargetRayDirection(rayPose) }
+}
+
+/***/ }),
+/* 7 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "initHitTestSource": () => (/* binding */ initHitTestSource),
+/* harmony export */   "getHitTestResults": () => (/* binding */ getHitTestResults),
+/* harmony export */   "requestHitTestPose": () => (/* binding */ requestHitTestPose)
+/* harmony export */ });
+
+
+// let hitTestSource = null
+// let hitTestSourceRequested = false
+
+
+const initHitTestSource = (session) => {
+  if (!session.hitTestSourceReqeusted) {
+    session.requestReferenceSpace('viewer')
+      .then( referenceSpace=> {
+        session.requestHitTestSource({space:referenceSpace})
+        .then(source => {
+          session.addEventListener('end', function () {
+            session.hitTestSourceReqeusted = false
+            session.hittestSource = null
+          })
+          session.hitTestSource =  source
+        } )
+    })
+  }
+}
+
+const getHitTestResults = (time,frame,session) => {
+  if (session.hitTestSource) return frame.getHitTestResults(session.hitTestSource)
+}
+
+const requestHitTestPose = (time,frame,session,renderer) => {
+  if(session.hitTestSource) {
+    const hitTestResults = getHitTestResults(time,frame,session)
+    if (hitTestResults.length) {
+      return hitTestResults[0].getPose(renderer.xr.getReferenceSpace())
+    }
+    // return getHitTestResults(time,frame,session)
+      // .then(hitTestResults => { 
+      //   return hitTestResults[0].getPose(session.referenceSpace)
+      // })
+  }
+}
+
+
+
+
+// const requestHitTest = (renderer,session, frame, reticle) => {
+//   if (frame) {
+//     const referenceSpace = renderer.xr.getReferenceSpace()
+
+//     if (hitTestSourceRequested === false) {
+//       session.requestReferenceSpace('viewer')
+//         .then(referenceSpace => {
+//           session.requestHitTestSource({ space: referenceSpace })
+//             .then(source => {
+//               hitTestSource = source
+//             })
+//         })
+//       session.addEventListener('end', function () {
+//         hitTestSourceRequested = false
+//         hitTestSource = null
+//       })
+//       hitTestSourceRequested = true
+//     }
+//     if (hitTestSource) {
+//       const hitTestResults = frame.getHitTestResults(hitTestSource);
+//       if (hitTestResults.length) {
+//         const hit = hitTestResults[0]
+
+//         reticle.visible = true
+//         reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
+//       } else {
+//         reticle.visbile = false
+//       }
+//     }
+//   }
+// }
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -54840,25 +54956,33 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
-/* harmony import */ var three_examples_jsm_webxr_ARButton__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(3);
+/* harmony import */ var _Helpers_ARButton__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _renderer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var _loader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _InteractionHelpers_TargetRaySpace_helper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _Helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
 
 
 
 
 
-console.log('wee')
+
+
 let container;
 let scene;
 let camera;
 let controller;
 let reticle;
-let hitTestSource = null
-let hitTestSourceRequested = false
+// let hitTestSource = null
+// let hitTestSourceRequested = false
+let sessionEval
+let prevSessionEval
 
-const selectRay = new three__WEBPACK_IMPORTED_MODULE_3__.Raycaster()
+
+let Session
+
+const selectRay = new three__WEBPACK_IMPORTED_MODULE_5__.Raycaster()
 
 const checkIntersections = (screenPos) => {
   // console.log('looking for intersection')
@@ -54877,8 +55001,8 @@ const init = async () => {
 
 
 
-  scene = new three__WEBPACK_IMPORTED_MODULE_3__.Scene()
-  camera = new three__WEBPACK_IMPORTED_MODULE_3__.PerspectiveCamera(
+  scene = new three__WEBPACK_IMPORTED_MODULE_5__.Scene()
+  camera = new three__WEBPACK_IMPORTED_MODULE_5__.PerspectiveCamera(
     70,
     window.innerWidth / window.innerHeight,
     .01,
@@ -54895,56 +55019,70 @@ const init = async () => {
   window.addEventListener('resize', resize())
 
   controller = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getController(0)
-  controller.addEventListener('select', onSelect)
 
+  // let session = renderer.xr.getSession()
+  // session.addEventListener('select', (e) => onSelectSession(e))
+  // function onSelectSession(event) {
+  //}
+  // CREATE EVENT LISTENER FOR WEBXR SELECT EVENT
+  controller.addEventListener('select', (e) => { onSelectController(e) })
   // function onSelect() {
   //   if (reticle.visible) {
   //     wolf.position.setFromMatrixPosition(reticle.matrix)
   //     wolf.visible = true
   //   }
   // }
+  function onSelectController(event) {
+    // const touch = new THREE.Vector2(0, 0)
 
-
-
-  function onSelect() {
-    const touch = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2(0, 0)
-    checkIntersections(touch)
-
+    // const targetRayPose = frame.
+    // checkIntersections(touch)
 
     // const controllerPosition = new THREE.Vector3()
     // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
-    // console.log(controllerPosition)
-
   }
 
-  reticle = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
-    new three__WEBPACK_IMPORTED_MODULE_3__.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
-    new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({ color: 'green' })
+
+  //EVENT HANDLER FOR WINDOW TOUCH, DOES NOT WORK, ATLEAST NOT IN EMULATION 
+  window.addEventListener('touchstart', (e) => { onTouch(e) })
+  function onTouch(event) {
+    const { clientX, clientY } = event.touches[0]
+  }
+
+
+
+
+
+
+
+  reticle = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(
+    new three__WEBPACK_IMPORTED_MODULE_5__.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
+    new three__WEBPACK_IMPORTED_MODULE_5__.MeshBasicMaterial({ color: 'green' })
   )
   reticle.matrixAutoUpdate = false
   reticle.visible = false
   scene.add(reticle)
 
-  const boxGeo = new three__WEBPACK_IMPORTED_MODULE_3__.BoxGeometry(.3, .3, .3)
-  const boxMesh = new three__WEBPACK_IMPORTED_MODULE_3__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
+  const boxGeo = new three__WEBPACK_IMPORTED_MODULE_5__.BoxGeometry(.2, .2, .2)
+  const boxMesh = new three__WEBPACK_IMPORTED_MODULE_5__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
 
-  const boxOne = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
+  const boxOne = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(
     boxGeo,
     boxMesh
   )
-  boxOne.position.set(1, 1, - 1)
+  boxOne.position.set(2, 0, - 1)
 
-  const boxTwo = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
+  const boxTwo = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(
     boxGeo,
     boxMesh
   )
-  boxTwo.position.set(0, 1, - 1)
+  boxTwo.position.set(0, 0, - 1)
 
-  const boxThree = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(
+  const boxThree = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(
     boxGeo,
     boxMesh
   )
-  boxThree.position.set(1, 1, - 1)
+  boxThree.position.set(2, 0, - 1)
 
 
   scene.add(boxOne)
@@ -54961,7 +55099,7 @@ const init = async () => {
   // const cube = new THREE.Mesh(geometry, material)
   // cube.position.set(0)
   // scene.add(cube)
-  const light = new three__WEBPACK_IMPORTED_MODULE_3__.HemisphereLight(0xffffbb, 0x080820, 1)
+  const light = new three__WEBPACK_IMPORTED_MODULE_5__.HemisphereLight(0xffffbb, 0x080820, 1)
   light.position.set(0.5, 1, 0.25)
 
   scene.add(light)
@@ -54969,9 +55107,15 @@ const init = async () => {
 
   container.appendChild(_renderer__WEBPACK_IMPORTED_MODULE_1__["default"].domElement)
 
-  document.body.appendChild(three_examples_jsm_webxr_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARButton.createButton(_renderer__WEBPACK_IMPORTED_MODULE_1__["default"], {
+  document.body.appendChild(_Helpers_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARButton.createButton(_renderer__WEBPACK_IMPORTED_MODULE_1__["default"], {
+
     domOverlay: {
       root: document.body
+    },
+    onStartCallback: (session) => {
+      Session = session
+      ;(0,_Helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__.initHitTestSource)(Session)
+
     }
   }))
 }
@@ -55014,38 +55158,47 @@ function animate() {
   _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].setAnimationLoop(render)
 }
 function render(timestamp, frame) {
+  if(frame && Session) {
 
-  // runHitTest(renderer, timestamp, frame, reticle)
-  if (frame) {
-    const referenceSpace = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getReferenceSpace()
-    const session = _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].xr.getSession()
-
-    if (hitTestSourceRequested === false) {
-      session.requestReferenceSpace('viewer')
-        .then(referenceSpace => {
-          session.requestHitTestSource({ space: referenceSpace })
-            .then(source => {
-              hitTestSource = source
-            })
-        })
-      session.addEventListener('end', function () {
-        hitTestSourceRequested = false
-        hitTestSource = null
-      })
-      hitTestSourceRequested = true
-    }
-    if (hitTestSource) {
-      const hitTestResults = frame.getHitTestResults(hitTestSource);
-      if (hitTestResults.length) {
-        const hit = hitTestResults[0]
-
-        reticle.visible = true
-        reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
-      } else {
-        reticle.visbile = false
-      }
+    const hitPose = (0,_Helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__.requestHitTestPose)(timestamp,frame,Session,_renderer__WEBPACK_IMPORTED_MODULE_1__["default"])
+    if(hitPose) {
+      console.log(hitPose)
+      reticle.visible = true
+      // reticle.matrix.fromArray(hitPose.transfrom.matrix)
+    } else {
+      reticle.visible = false
     }
   }
+    // runHitTest(renderer, timestamp, frame, reticle)
+  // if (frame) {
+  //   const referenceSpace = renderer.xr.getReferenceSpace()
+  //   const session = renderer.xr.getSession()
+  //   if (hitTestSourceRequested === false) {
+  //     session.requestReferenceSpace('viewer')
+  //       .then(referenceSpace => {
+  //         session.requestHitTestSource({ space: referenceSpace })
+  //           .then(source => {
+  //             hitTestSource = source
+  //           })
+  //       })
+  //     session.addEventListener('end', function () {
+  //       hitTestSourceRequested = false
+  //       hitTestSource = null
+  //     })
+  //     hitTestSourceRequested = true
+  //   }
+  //   if (hitTestSource) {
+  //     const hitTestResults = frame.getHitTestResults(hitTestSource);
+  //     if (hitTestResults.length) {
+  //       const hit = hitTestResults[0]
+
+  //       reticle.visible = true
+  //       reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
+  //     } else {
+  //       reticle.visbile = false
+  //     }
+  //   }
+  // }
   _renderer__WEBPACK_IMPORTED_MODULE_1__["default"].render(scene, camera)
 }
 

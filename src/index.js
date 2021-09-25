@@ -1,16 +1,22 @@
 import * as THREE from 'three'
-import { ARButton } from 'three/examples/jsm/webxr/ARButton'
+import { ARButton } from './Helpers/ARButton'
 import renderer from './renderer'
 import { loadGLTF } from './loader'
+import { requestTargetRayInfo } from './InteractionHelpers/TargetRaySpace.helper'
+import {initHitTestSource,getHitTestResults,requestHitTestPose} from './Helpers/hitTest'
 
-console.log('wee')
 let container;
 let scene;
 let camera;
 let controller;
 let reticle;
-let hitTestSource = null
-let hitTestSourceRequested = false
+// let hitTestSource = null
+// let hitTestSourceRequested = false
+let sessionEval
+let prevSessionEval
+
+
+let Session
 
 const selectRay = new THREE.Raycaster()
 
@@ -49,27 +55,41 @@ const init = async () => {
   window.addEventListener('resize', resize())
 
   controller = renderer.xr.getController(0)
-  controller.addEventListener('select', onSelect)
 
+  // let session = renderer.xr.getSession()
+  // session.addEventListener('select', (e) => onSelectSession(e))
+  // function onSelectSession(event) {
+  //}
+  // CREATE EVENT LISTENER FOR WEBXR SELECT EVENT
+  controller.addEventListener('select', (e) => { onSelectController(e) })
   // function onSelect() {
   //   if (reticle.visible) {
   //     wolf.position.setFromMatrixPosition(reticle.matrix)
   //     wolf.visible = true
   //   }
   // }
+  function onSelectController(event) {
+    // const touch = new THREE.Vector2(0, 0)
 
-
-
-  function onSelect() {
-    const touch = new THREE.Vector2(0, 0)
-    checkIntersections(touch)
-
+    // const targetRayPose = frame.
+    // checkIntersections(touch)
 
     // const controllerPosition = new THREE.Vector3()
     // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
-    // console.log(controllerPosition)
-
   }
+
+
+  //EVENT HANDLER FOR WINDOW TOUCH, DOES NOT WORK, ATLEAST NOT IN EMULATION 
+  window.addEventListener('touchstart', (e) => { onTouch(e) })
+  function onTouch(event) {
+    const { clientX, clientY } = event.touches[0]
+  }
+
+
+
+
+
+
 
   reticle = new THREE.Mesh(
     new THREE.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
@@ -79,26 +99,26 @@ const init = async () => {
   reticle.visible = false
   scene.add(reticle)
 
-  const boxGeo = new THREE.BoxGeometry(.3, .3, .3)
+  const boxGeo = new THREE.BoxGeometry(.2, .2, .2)
   const boxMesh = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() })
 
   const boxOne = new THREE.Mesh(
     boxGeo,
     boxMesh
   )
-  boxOne.position.set(1, 1, - 1)
+  boxOne.position.set(2, 0, - 1)
 
   const boxTwo = new THREE.Mesh(
     boxGeo,
     boxMesh
   )
-  boxTwo.position.set(0, 1, - 1)
+  boxTwo.position.set(0, 0, - 1)
 
   const boxThree = new THREE.Mesh(
     boxGeo,
     boxMesh
   )
-  boxThree.position.set(1, 1, - 1)
+  boxThree.position.set(2, 0, - 1)
 
 
   scene.add(boxOne)
@@ -124,8 +144,14 @@ const init = async () => {
   container.appendChild(renderer.domElement)
 
   document.body.appendChild(ARButton.createButton(renderer, {
+
     domOverlay: {
       root: document.body
+    },
+    onStartCallback: (session) => {
+      Session = session
+      initHitTestSource(Session)
+
     }
   }))
 }
@@ -168,38 +194,47 @@ function animate() {
   renderer.setAnimationLoop(render)
 }
 function render(timestamp, frame) {
+  if(frame && Session) {
 
-  // runHitTest(renderer, timestamp, frame, reticle)
-  if (frame) {
-    const referenceSpace = renderer.xr.getReferenceSpace()
-    const session = renderer.xr.getSession()
-
-    if (hitTestSourceRequested === false) {
-      session.requestReferenceSpace('viewer')
-        .then(referenceSpace => {
-          session.requestHitTestSource({ space: referenceSpace })
-            .then(source => {
-              hitTestSource = source
-            })
-        })
-      session.addEventListener('end', function () {
-        hitTestSourceRequested = false
-        hitTestSource = null
-      })
-      hitTestSourceRequested = true
-    }
-    if (hitTestSource) {
-      const hitTestResults = frame.getHitTestResults(hitTestSource);
-      if (hitTestResults.length) {
-        const hit = hitTestResults[0]
-
-        reticle.visible = true
-        reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
-      } else {
-        reticle.visbile = false
-      }
+    const hitPose = requestHitTestPose(timestamp,frame,Session,renderer)
+    if(hitPose) {
+      console.log(hitPose)
+      reticle.visible = true
+      // reticle.matrix.fromArray(hitPose.transfrom.matrix)
+    } else {
+      reticle.visible = false
     }
   }
+    // runHitTest(renderer, timestamp, frame, reticle)
+  // if (frame) {
+  //   const referenceSpace = renderer.xr.getReferenceSpace()
+  //   const session = renderer.xr.getSession()
+  //   if (hitTestSourceRequested === false) {
+  //     session.requestReferenceSpace('viewer')
+  //       .then(referenceSpace => {
+  //         session.requestHitTestSource({ space: referenceSpace })
+  //           .then(source => {
+  //             hitTestSource = source
+  //           })
+  //       })
+  //     session.addEventListener('end', function () {
+  //       hitTestSourceRequested = false
+  //       hitTestSource = null
+  //     })
+  //     hitTestSourceRequested = true
+  //   }
+  //   if (hitTestSource) {
+  //     const hitTestResults = frame.getHitTestResults(hitTestSource);
+  //     if (hitTestResults.length) {
+  //       const hit = hitTestResults[0]
+
+  //       reticle.visible = true
+  //       reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
+  //     } else {
+  //       reticle.visbile = false
+  //     }
+  //   }
+  // }
   renderer.render(scene, camera)
 }
 
