@@ -3,7 +3,7 @@ import { ARButton } from './Helpers/ARButton'
 import renderer from './renderer'
 import { loadGLTF } from './loader'
 import { requestTargetRayInfo } from './InteractionHelpers/TargetRaySpace.helper'
-import {initHitTestSource,getHitTestResults,requestHitTestPose} from './Helpers/hitTest'
+import {initHitTestSource,requestHitTestPoseMatrix} from './Helpers/hitTest'
 
 let container;
 let scene;
@@ -196,11 +196,12 @@ function animate() {
 function render(timestamp, frame) {
   if(frame && Session) {
 
-    const hitPose = requestHitTestPose(timestamp,frame,Session,renderer)
-    if(hitPose) {
-      console.log(hitPose)
+    const hitPoseMatrix = requestHitTestPoseMatrix(timestamp,frame,Session,renderer)
+    if(hitPoseMatrix) {
+      console.log(hitPoseMatrix)
       reticle.visible = true
-      // reticle.matrix.fromArray(hitPose.transfrom.matrix)
+      reticle.matrix.fromArray(hitPoseMatrix)
+      // console.log(hitPose.transfrom.matrix)
     } else {
       reticle.visible = false
     }

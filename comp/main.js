@@ -54819,7 +54819,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "initHitTestSource": () => (/* binding */ initHitTestSource),
 /* harmony export */   "getHitTestResults": () => (/* binding */ getHitTestResults),
-/* harmony export */   "requestHitTestPose": () => (/* binding */ requestHitTestPose)
+/* harmony export */   "requestHitTestPoseMatrix": () => (/* binding */ requestHitTestPoseMatrix)
 /* harmony export */ });
 
 
@@ -54847,11 +54847,12 @@ const getHitTestResults = (time,frame,session) => {
   if (session.hitTestSource) return frame.getHitTestResults(session.hitTestSource)
 }
 
-const requestHitTestPose = (time,frame,session,renderer) => {
+//returns the hitTestResultPose Matrix for use in setting position of other objects
+const requestHitTestPoseMatrix = (time,frame,session,renderer) => {
   if(session.hitTestSource) {
     const hitTestResults = getHitTestResults(time,frame,session)
     if (hitTestResults.length) {
-      return hitTestResults[0].getPose(renderer.xr.getReferenceSpace())
+      return hitTestResults[0].getPose(renderer.xr.getReferenceSpace()).transform.matrix
     }
     // return getHitTestResults(time,frame,session)
       // .then(hitTestResults => { 
@@ -55160,11 +55161,12 @@ function animate() {
 function render(timestamp, frame) {
   if(frame && Session) {
 
-    const hitPose = (0,_Helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__.requestHitTestPose)(timestamp,frame,Session,_renderer__WEBPACK_IMPORTED_MODULE_1__["default"])
-    if(hitPose) {
-      console.log(hitPose)
+    const hitPoseMatrix = (0,_Helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__.requestHitTestPoseMatrix)(timestamp,frame,Session,_renderer__WEBPACK_IMPORTED_MODULE_1__["default"])
+    if(hitPoseMatrix) {
+      console.log(hitPoseMatrix)
       reticle.visible = true
-      // reticle.matrix.fromArray(hitPose.transfrom.matrix)
+      reticle.matrix.fromArray(hitPoseMatrix)
+      // console.log(hitPose.transfrom.matrix)
     } else {
       reticle.visible = false
     }

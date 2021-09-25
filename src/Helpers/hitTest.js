@@ -24,11 +24,12 @@ export const getHitTestResults = (time,frame,session) => {
   if (session.hitTestSource) return frame.getHitTestResults(session.hitTestSource)
 }
 
-export const requestHitTestPose = (time,frame,session,renderer) => {
+//returns the hitTestResultPose Matrix for use in setting position of other objects
+export const requestHitTestPoseMatrix = (time,frame,session,renderer) => {
   if(session.hitTestSource) {
     const hitTestResults = getHitTestResults(time,frame,session)
     if (hitTestResults.length) {
-      return hitTestResults[0].getPose(renderer.xr.getReferenceSpace())
+      return hitTestResults[0].getPose(renderer.xr.getReferenceSpace()).transform.matrix
     }
     // return getHitTestResults(time,frame,session)
       // .then(hitTestResults => { 
