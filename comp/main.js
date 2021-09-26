@@ -54820,7 +54820,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "initHitTestSource": () => (/* binding */ initHitTestSource),
 /* harmony export */   "getHitTestResults": () => (/* binding */ getHitTestResults),
-/* harmony export */   "requestHitTestPoseMatrix": () => (/* binding */ requestHitTestPoseMatrix)
+/* harmony export */   "requestHitTestPoseMatrix": () => (/* binding */ requestHitTestPoseMatrix),
+/* harmony export */   "updateObjectMatrixFromHit": () => (/* binding */ updateObjectMatrixFromHit)
 /* harmony export */ });
 function initHitTestSource(session) {
   if (!session.hitTestSourceReqeusted) {
@@ -54852,6 +54853,10 @@ function requestHitTestPoseMatrix(time, frame, session, renderer) {
   }
 }
 
+function updateObjectMatrixFromHit(object, hitMatrix) {
+  object.matrix.fromArray(hitMatrix)
+}
+
 
 /***/ }),
 /* 8 */
@@ -54861,9 +54866,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "initARApp": () => (/* binding */ initARApp)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
 /* harmony import */ var _components_renderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _utilities_resizeWindow_utility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
+/* harmony import */ var _resizeWindow_utility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
+/* harmony import */ var _onSceneStartObjects__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
 
 
 
@@ -54877,9 +54883,9 @@ function initARApp() {
 
   arApp.renderer = (0,_components_renderer__WEBPACK_IMPORTED_MODULE_0__.initRenderer)()
 
-  arApp.scene = new three__WEBPACK_IMPORTED_MODULE_2__.Scene()
+  arApp.scene = new three__WEBPACK_IMPORTED_MODULE_3__.Scene()
 
-  arApp.camera = new three__WEBPACK_IMPORTED_MODULE_2__.PerspectiveCamera(
+  arApp.camera = new three__WEBPACK_IMPORTED_MODULE_3__.PerspectiveCamera(
     70,
     window.innerWidth / window.innerHeight,
     .01,
@@ -54888,7 +54894,9 @@ function initARApp() {
 
   arApp.controller = arApp.renderer.xr.getController(0)
 
-  ;(0,_utilities_resizeWindow_utility__WEBPACK_IMPORTED_MODULE_1__.addResizeEventListener)(arApp)
+  ;(0,_resizeWindow_utility__WEBPACK_IMPORTED_MODULE_1__.addResizeEventListener)(arApp)
+
+  ;(0,_onSceneStartObjects__WEBPACK_IMPORTED_MODULE_2__["default"])(arApp.scene)
 
   return arApp
 }
@@ -54914,6 +54922,91 @@ function addResizeEventListener(arApp) {
 }
 
 
+
+/***/ }),
+/* 10 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+//organization and gathering of objects to be established and immidiately added to the scene at start
+
+
+const startObjects = []
+
+// LIGHTS!
+const light = new three__WEBPACK_IMPORTED_MODULE_0__.HemisphereLight(0xffffbb, 0x080820, 1)
+light.position.set(0.5, 1, 0.25)
+startObjects.push(light)
+
+const directionalLight = new three__WEBPACK_IMPORTED_MODULE_0__.DirectionalLight();
+directionalLight.position.set(0.2, 1, 1);
+startObjects.push(directionalLight)
+
+// Test Boxes
+const boxGeo = new three__WEBPACK_IMPORTED_MODULE_0__.BoxGeometry(.2, .2, .2)
+const boxMesh = new three__WEBPACK_IMPORTED_MODULE_0__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
+
+const boxOne = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
+  boxGeo,
+  boxMesh
+)
+boxOne.position.set(-1.5, 0, - 1)
+const boxTwo = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
+  boxGeo,
+  boxMesh
+)
+boxTwo.position.set(0, 0, - 1)
+
+const boxThree = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
+  boxGeo,
+  boxMesh
+)
+boxThree.position.set(1.5, 0, - 1)
+startObjects.push(...[boxOne, boxTwo, boxThree])
+console.log(startObjects)
+
+function addStartObjectsToScene(scene) {
+  startObjects.forEach(obj => scene.add(obj))
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (addStartObjectsToScene);
+
+
+/***/ }),
+/* 11 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+
+
+const reticle = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
+  new three__WEBPACK_IMPORTED_MODULE_0__.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
+  new three__WEBPACK_IMPORTED_MODULE_0__.MeshBasicMaterial({ color: 'green' })
+)
+reticle.matrixAutoUpdate = false
+reticle.visible = false
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (reticle);
+
+/***/ }),
+/* 12 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ animate)
+/* harmony export */ });
+function animate(arApp, renderFunc) {
+  arApp.renderer.setAnimationLoop(renderFunc)
+}
 
 /***/ })
 /******/ 	]);
@@ -54976,13 +55069,14 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(3);
 /* harmony import */ var _components_ARButton__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _components_renderer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var _components_loader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
-/* harmony import */ var _helpers_interactionHelpers_targetRaySpace__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _helpers_targetRaySpace__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
 /* harmony import */ var _helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
 /* harmony import */ var _helpers_initARApp__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
+/* harmony import */ var _components_reticle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(11);
+/* harmony import */ var _helpers_animate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(12);
 
 
 
@@ -54991,16 +55085,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-let container;
-let reticle;
 
-container = document.createElement('div');
+
+const container = document.createElement('div');
 document.body.appendChild(container)
 
 const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_5__.initARApp)()
 
-
-// let Session
+arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_6__["default"])
 
 // const selectRay = new THREE.Raycaster()
 
@@ -55015,80 +55107,14 @@ const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_5__.initARApp)()
 //   }
 // }
 
-// const init = async () => {
 
 
-
-//   scene = new THREE.Scene()
-//   camera = new THREE.PerspectiveCamera(
-//     70,
-//     window.innerWidth / window.innerHeight,
-//     .01,
-//     20
-//   )
-//   // camera.position.set(0, 1.6, 3)
-
-//   function resize() {
-//     camera.aspect = window.innerWidth / window.innerHeight;
-//     camera.updateProjectionMatrix();
-//     renderer.setSize(window.innerWidth, window.innerHeight);
-//   }
-
-//   window.addEventListener('resize', resize())
-
-//   controller = renderer.xr.getController(0)
-
-
-const light = new three__WEBPACK_IMPORTED_MODULE_6__.HemisphereLight(0xffffbb, 0x080820, 1)
-light.position.set(0.5, 1, 0.25)
-
-arApp.scene.add(light)
-
-reticle = new three__WEBPACK_IMPORTED_MODULE_6__.Mesh(
-  new three__WEBPACK_IMPORTED_MODULE_6__.RingGeometry(0.15, .2, 32).rotateX(-Math.PI / 2),
-  new three__WEBPACK_IMPORTED_MODULE_6__.MeshBasicMaterial({ color: 'green' })
-)
-reticle.matrixAutoUpdate = false
-reticle.visible = false
-arApp.scene.add(reticle)
-
-const boxGeo = new three__WEBPACK_IMPORTED_MODULE_6__.BoxGeometry(.2, .2, .2)
-const boxMesh = new three__WEBPACK_IMPORTED_MODULE_6__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
-
-const boxOne = new three__WEBPACK_IMPORTED_MODULE_6__.Mesh(
-  boxGeo,
-  boxMesh
-)
-boxOne.position.set(2, 0, - 1)
-
-const boxTwo = new three__WEBPACK_IMPORTED_MODULE_6__.Mesh(
-  boxGeo,
-  boxMesh
-)
-boxTwo.position.set(0, 0, - 1)
-
-const boxThree = new three__WEBPACK_IMPORTED_MODULE_6__.Mesh(
-  boxGeo,
-  boxMesh
-)
-boxThree.position.set(2, 0, - 1)
-
-
-arApp.scene.add(boxOne)
-arApp.scene.add(boxTwo)
-arApp.scene.add(boxThree)
 
 // const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
 // wolf.visible = false
 // scene.add(wolf)
 
 
-// const geometry = new THREE.BoxGeometry()
-// const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-
-// const cube = new THREE.Mesh(geometry, material)
-// cube.position.set(0)
-// scene.add(cube)
 
 // let session = renderer.xr.getSession()
 // session.addEventListener('select', (e) => onSelectSession(e))
@@ -55119,31 +55145,23 @@ function onTouch(event) {
   const { clientX, clientY } = event.touches[0]
 }
 
-console.log((arApp.scene.children))
 
-
-function animate(arApp, renderFunc) {
-  arApp.renderer.setAnimationLoop(renderFunc)
-}
+// function animate(arApp, renderFunc) {
+//   arApp.renderer.setAnimationLoop(renderFunc)
+// }
 
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
-
     const hitPoseMatrix = (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__.requestHitTestPoseMatrix)(timestamp, frame, arApp.session, arApp.renderer)
     if (hitPoseMatrix) {
-      reticle.visible = true
-      reticle.matrix.fromArray(hitPoseMatrix)
+      (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_4__.updateObjectMatrixFromHit)(_components_reticle__WEBPACK_IMPORTED_MODULE_6__["default"], hitPoseMatrix)
+      _components_reticle__WEBPACK_IMPORTED_MODULE_6__["default"].visible = true
     } else {
-      reticle.visible = false
+      _components_reticle__WEBPACK_IMPORTED_MODULE_6__["default"].visible = false
     }
   }
-
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
-
-
-// init()
-// animate()
 
 document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARButton.createButton(arApp.renderer, {
   domOverlay: {
@@ -55156,11 +55174,7 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
   },
 }))
 
-
-animate(arApp, renderARApp)
-
-
-// document.body.appendChild(ARButton.createButton(renderer))
+;(0,_helpers_animate__WEBPACK_IMPORTED_MODULE_7__["default"])(arApp, renderARApp)
 
 
 

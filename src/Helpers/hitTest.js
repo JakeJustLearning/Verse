@@ -27,3 +27,7 @@ export function requestHitTestPoseMatrix(time, frame, session, renderer) {
     }
   }
 }
+
+export function updateObjectMatrixFromHit(object, hitMatrix) {
+  object.matrix.fromArray(hitMatrix)
+}
