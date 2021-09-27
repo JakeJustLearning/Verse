@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { ARButton } from './components/ARButton'
 // import { renderer } from './components/renderer'
 // import { loadGLTF } from './components/loader'
-import { getTargetRayPose, requestTargetRayInfo } from './helpers/targetRaySpace'
+// import { getTargetRayPose, requestTargetRayInfo } from './helpers/targetRaySpace'
 import { initHitTestSource, requestHitTestPoseMatrix, updateObjectMatrixFromHit } from './helpers/hitTest'
 import { initARApp } from './helpers/initARApp'
 import reticle from './components/reticle'
@@ -14,22 +14,22 @@ document.body.appendChild(container)
 const arApp = initARApp()
 
 arApp.scene.add(reticle)
-// let targetRayPose
+let targetRayPose
 
 const selectRay = new THREE.Raycaster()
 
 function checkIntersections(origin, direction) {
-  // console.log('looking for intersection')
+  console.log('looking for intersection')
   selectRay.set(origin, direction)
+  console.log(arApp.scene.children)
   const intersects = selectRay.intersectObjects(arApp.scene.children)
-  // const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
+  console.log(intersects)
+  const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
   if (intersects[0]) {
-    intersects[0].object.rotateX(25)
+    console.log('intersections found', intersects)
     intersects[0].object.material.color.set(0xffffff * Math.random())
-
-
   }
-  // arApp.scene.add(arrowHelper)
+  arApp.scene.add(arrowHelper)
 }
 
 
@@ -69,11 +69,7 @@ function checkIntersections(origin, direction) {
 //     wolf.visible = true
 //   }
 // }
-async function onSelectController(event) {
-  console.log(event)
-  console.log(arApp.controller)
-  // let axis = event.inputSource.gamepad.axes
-  console.log('on controller event', event)
+function onSelectController(event) {
   const touchOrigin = new THREE.Vector3()
   touchOrigin.set(0, 0, 0).applyMatrix4(arApp.controller.matrixWorld)
   const touchDirection = new THREE.Vector3()
@@ -85,22 +81,6 @@ async function onSelectController(event) {
 
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
-    // handle onSelect in renderFrame
-    // if (arApp.source.onSelect) {
-    //   let event = arApp.source.onSelect
-    //   // let frame = event.frame
-    //   let targetRaySpace = event.inputSource.targetRaySpace
-    //   let targetRayPose
-    //   arApp.session.requestReferenceSpace('viewer')
-    //     .then(refSpace => {
-    //       console.log({ targetRaySpace, refSpace, frame })
-    //       targetRayPose = frame.getPose(targetRaySpace, refSpace)
-    //       console.log(targetRayPose)
-    //       // console.log(targetPose)
-    //     })
-    // }
-
-
     const hitPoseMatrix = requestHitTestPoseMatrix(timestamp, frame, arApp.session, arApp.renderer)
     if (hitPoseMatrix) {
       updateObjectMatrixFromHit(reticle, hitPoseMatrix)
@@ -109,7 +89,6 @@ function renderARApp(timestamp, frame) {
       reticle.visible = false
     }
   }
-  // arApp.source.onSelect = null
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 
