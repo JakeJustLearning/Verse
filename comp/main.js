@@ -50887,7 +50887,7 @@ function checkIntersections(origin, direction) {
 //   }
 //   arApp.session.requestReferenceSpace('viewer')
 //     .then(viewerRefSpace => {
-//       if (viewerRefSpace) {
+//       if (viewerRewfSpace) {
 //         const targetRayPose = event.frame.getPose(source.targetRaySpace, viewerRefSpace)
 //         console.log(targetRayPose)
 //       }
@@ -50907,10 +50907,17 @@ function checkIntersections(origin, direction) {
 //   }
 // }
 function onSelectController(event) {
-  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3()
-  touchOrigin.set(0, 0, 0).applyMatrix4(arApp.controller.matrixWorld)
+  console.log(arApp)
+  console.log(arApp.controller.position)
+  // const touchOrigin = new THREE.Vector3()
+  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
+  // touchOrigin.
   const touchDirection = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3()
-  touchDirection.set(0, 0, -1).applyMatrix4(arApp.controller.matrixWorld)
+  arApp.camera.getWorldDirection(touchDirection)
+  touchDirection.subVectors(touchOrigin, touchDirection)
+  touchDirection.subVectors(touchOrigin, touchDirection)
+  // touchOrigin.sub(arApp.camera.position).normalize()
+  // touchDirection.setFromMatrixPosition(arApp.controller.matrixWorld).makeTranslation(0, 0, -1)
   console.log({ touchOrigin, touchDirection })
   checkIntersections(touchOrigin, touchDirection)
 
