@@ -20,12 +20,17 @@ export function initARApp() {
     .01,
     20
   )
-
   arApp.controller = arApp.renderer.xr.getController(0)
+  //IMPORTANT!
+  arApp.scene.add(arApp.controller)
+  console.log(arApp.controller)
+
 
   addResizeEventListener(arApp)
 
   addStartObjectsToScene(arApp.scene)
+
+  arApp.scene
 
   return arApp
 }

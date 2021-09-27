@@ -325,12 +325,17 @@ function initARApp() {
     .01,
     20
   )
-
   arApp.controller = arApp.renderer.xr.getController(0)
+  //IMPORTANT!
+  arApp.scene.add(arApp.controller)
+  console.log(arApp.controller)
+
 
   ;(0,_resizeWindow_utility__WEBPACK_IMPORTED_MODULE_1__.addResizeEventListener)(arApp)
 
   ;(0,_onSceneStartObjects__WEBPACK_IMPORTED_MODULE_2__["default"])(arApp.scene)
+
+  arApp.scene
 
   return arApp
 }
@@ -50882,7 +50887,9 @@ document.body.appendChild(container)
 const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_3__.initARApp)()
 
 arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"])
-let targetRayPose
+const arrowHelper = new three__WEBPACK_IMPORTED_MODULE_6__.ArrowHelper(new three__WEBPACK_IMPORTED_MODULE_6__.Vector3(0, 0, 0), new three__WEBPACK_IMPORTED_MODULE_6__.Vector3(0, 0, 0), 2, 0xffff00)
+arrowHelper.visible = false
+arApp.scene.add(arrowHelper)
 
 const selectRay = new three__WEBPACK_IMPORTED_MODULE_6__.Raycaster()
 
@@ -50891,105 +50898,31 @@ function checkIntersections(origin, direction) {
   selectRay.set(origin, direction)
   const intersects = selectRay.intersectObjects(arApp.scene.children)
   if (intersects[0]) intersects[0].object.rotateX(25)
-  const arrowHelper = new three__WEBPACK_IMPORTED_MODULE_6__.ArrowHelper(direction, origin, 1, 0xffff00)
-  arApp.scene.add(arrowHelper)
+  arrowHelper.position.set(origin)
+  arrowHelper.setDirection(direction)
+  arrowHelper.visible = true
 }
-
-
-
 
 // const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
 // wolf.visible = false
 // scene.add(wolf)
 
-
-
-
-// function handleSessionOnSelect(event) {
-//   console.log('onselect event happening')
-//   let source = event.inputSource
-//   if (arApp.session.hitTestSource) {
-
-//   }
-//   arApp.session.requestReferenceSpace('viewer')
-//     .then(viewerRefSpace => {
-//       if (viewerRefSpace) {
-//         const targetRayPose = event.frame.getPose(source.targetRaySpace, viewerRefSpace)
-//         console.log(targetRayPose)
-//       }
-//     })
-//   // console.log('on session event', event)
-//   // console.log(event.frame)
-//   // console.log(arApp.session)
-//   // console.log(event.inputSource.targetRaySpace)
-//   // console.log(getTargetRayPose(event.frame, arApp.session, event.inputSource.targetRaySpace))
-// }
-// CREATE EVENT LISTENER FOR WEBXR SELECT EVENTs
-arApp.controller.addEventListener('select', (e) => {
-  onSelectController(e)
-})
 // function onSelect() {
 //   if (reticle.visible) {
 //     wolf.position.setFromMatrixPosition(reticle.matrix)
 //     wolf.visible = true
 //   }
 // }
+
 async function onSelectController(event) {
-  console.log(event)
-  console.log(arApp.controller)
-  // let axis = event.inputSource.gamepad.axes
-  console.log('on controller event', event)
-  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3(0, 0, 0).applyMatrix4(arApp.controller.matrixWorld)
-  const touchDirection = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3(0, 0, -1).applyMatrix4(arApp.controller.matrixWorld)
-  // touch.x = axis[0]
-  // touch.y = axis[1]
-  // const refSpace = await event.frame.session.requestReferenceSpace('viewer')
-  // const pose = event.frame.getPose(event.inputSource.targetRaySpace, refSpace)
-  // document.getElementById('status').innerHTML(`${touch.x},${touch.y}`)
-  // console.log(pose)
-  // console.log(touch)
+  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3()
+  touchOrigin.set(0, 0, 0).applyMatrix4(arApp.controller.matrixWorld)
+  const touchDirection = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3()
+  touchDirection.set(0, 0, -1).applyMatrix4(arApp.controller.matrixWorld)
   checkIntersections(touchOrigin, touchDirection)
-
-  // const targetRayPose = frame.
-
-  // const controllerPosition = new THREE.Vector3()
-  // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
 }
-
-// function testaddblocktoscene() {
-//   const geo = new THREE.BoxGeometry(1, 1, 1)
-//   const material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() })
-//   const box = new THREE.Mesh(geo, material)
-//   box.position.setFromMatrixPosition(reticle.matrix)
-//   box.visible = true
-//   arApp.scene.add(box)
-// }
-
-
-//EVENT HANDLER FOR WINDOW TOUCH, DOES NOT WORK, ATLEAST NOT IN EMULATION 
-// window.addEventListener('touchstart', (e) => { onTouch(e) })
-// function onTouch(event) {
-//   const { clientX, clientY } = event.touches[0]
-// }
-
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
-    // handle onSelect in renderFrame
-    if (arApp.source.onSelect) {
-      let event = arApp.source.onSelect
-      // let frame = event.frame
-      let targetRaySpace = event.inputSource.targetRaySpace
-      let targetRayPose
-      arApp.session.requestReferenceSpace('viewer')
-        .then(refSpace => {
-          console.log({ targetRaySpace, refSpace, frame })
-          targetRayPose = frame.getPose(targetRaySpace, refSpace)
-          console.log(targetRayPose)
-          // console.log(targetPose)
-        })
-    }
-
-
     const hitPoseMatrix = (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.requestHitTestPoseMatrix)(timestamp, frame, arApp.session, arApp.renderer)
     if (hitPoseMatrix) {
       (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.updateObjectMatrixFromHit)(_components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"], hitPoseMatrix)
@@ -50998,7 +50931,6 @@ function renderARApp(timestamp, frame) {
       _components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"].visible = false
     }
   }
-  arApp.source.onSelect = null
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 
@@ -51010,31 +50942,10 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
     arApp.session = session
     await (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.initHitTestSource)(arApp.session)
     container.appendChild(arApp.renderer.domElement)
-    // arApp.session.addEventListener('select', (e) => {
-    //   onSelectController(e)
-    // })
-    // arApp.session.addEventListener('select', (e) => { onSelectSession(e) })
-    // arApp.session.addEventListener('select', (event) => {
-    //   if (event.inputSource.targetRayMode == 'screen') {
-    //     // arApp.source.onSelect = event
-    //     let frame = event.frame
-    //     let targetRaySpace = event.inputSource.targetRaySpace
-    //     let targetRayPose
-    //     frame.session.requestReferenceSpace('viewer')
-    //       .then(refSpace => {
-    //         console.log({ targetRaySpace, refSpace, frame })
-    //         targetRayPose = frame.getPose(targetRaySpace, refSpace)
-    //         console.log(targetRayPose)
-
-    //       })
-
-    //     if (targetRayPose) {
-    //       console.log(targetRayPose)
-    //       testaddblocktoscene()
-    //     }
-    //   }
-    //   arApp.source.onSelect = event.inputSource
-    // })
+    arApp.controller = arApp.renderer.xr.getController(0)
+    arApp.controller.addEventListener('select', (e) => {
+      onSelectController(e)
+    })
   },
 }))
 
