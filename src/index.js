@@ -1,4 +1,4 @@
-// import * as THREE from 'three'
+import * as THREE from 'three'
 import { ARButton } from './components/ARButton'
 // import { renderer } from './components/renderer'
 // import { loadGLTF } from './components/loader'
@@ -78,6 +78,14 @@ function onSelectController(event) {
   // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
 }
 
+function testaddblocktoscene() {
+  const geo = new THREE.BoxGeometry(1, 1, 1)
+  const material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() })
+  const box = new THREE.Mesh(geo, material)
+  box.position.setFromMatrixPosition(reticle.matrix)
+  arApp.scene.add(box)
+}
+
 
 //EVENT HANDLER FOR WINDOW TOUCH, DOES NOT WORK, ATLEAST NOT IN EMULATION 
 window.addEventListener('touchstart', (e) => { onTouch(e) })
@@ -125,6 +133,7 @@ document.body.appendChild(ARButton.createButton(arApp.renderer, {
         let targetRayPose = event.frame.getPose(event.inputSource.targetRaySpace, arApp.session.hitTestSource)
         if (targetRayPose) {
           console.log(targetRayPose)
+          testaddblocktoscene()
         }
       }
       arApp.source.onSelect = event.inputSource

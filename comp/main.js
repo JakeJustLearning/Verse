@@ -50861,13 +50861,14 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
 /* harmony import */ var _components_ARButton__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _helpers_targetRaySpace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var _helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
 /* harmony import */ var _helpers_initARApp__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
 /* harmony import */ var _components_reticle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
 /* harmony import */ var _helpers_animate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(10);
-// import * as THREE from 'three'
+
 
 // import { renderer } from './components/renderer'
 // import { loadGLTF } from './components/loader'
@@ -50947,6 +50948,14 @@ function onSelectController(event) {
   // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
 }
 
+function testaddblocktoscene() {
+  const geo = new three__WEBPACK_IMPORTED_MODULE_6__.BoxGeometry(1, 1, 1)
+  const material = new three__WEBPACK_IMPORTED_MODULE_6__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
+  const box = new three__WEBPACK_IMPORTED_MODULE_6__.Mesh(geo, material)
+  box.position.setFromMatrixPosition(_components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"].matrix)
+  arApp.scene.add(box)
+}
+
 
 //EVENT HANDLER FOR WINDOW TOUCH, DOES NOT WORK, ATLEAST NOT IN EMULATION 
 window.addEventListener('touchstart', (e) => { onTouch(e) })
@@ -50994,6 +51003,7 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
         let targetRayPose = event.frame.getPose(event.inputSource.targetRaySpace, arApp.session.hitTestSource)
         if (targetRayPose) {
           console.log(targetRayPose)
+          testaddblocktoscene()
         }
       }
       arApp.source.onSelect = event.inputSource
