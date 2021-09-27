@@ -50918,13 +50918,13 @@ function onSelectController(event) {
   // touchDirection.subVectors(touchOrigin, touchDirection)
   // touchDirection.subVectors(touchOrigin, touchDirection)
 
-  const directionFromCamera = touchOrigin.clone().sub(cameraPosition)
+  const directionFromCamera = touchOrigin.clone().sub(cameraPosition).normalize()
   touchDirection.add(directionFromCamera)
 
   // touchOrigin.sub(arApp.camera.position).normalize()
   // touchDirection.setFromMatrixPosition(arApp.controller.matrixWorld).makeTranslation(0, 0, -1)
-  console.log({ touchOrigin, touchDirection })
-  checkIntersections(touchOrigin, touchDirection)
+  console.log({ touchOrigin, directionFromCamera })
+  checkIntersections(touchOrigin, directionFromCamera)
 
 }
 
