@@ -55,8 +55,7 @@ function checkIntersections(screenPos) {
 //   // console.log(getTargetRayPose(event.frame, arApp.session, event.inputSource.targetRaySpace))
 // }
 // CREATE EVENT LISTENER FOR WEBXR SELECT EVENTs
-arApp.renderer.domElement.addEventListener('touchStart', (e) => {
-  e.preventDefault()
+arApp.controller.addEventListener('select', (e) => {
   onSelectController(e)
 })
 // function onSelect() {
@@ -66,17 +65,20 @@ arApp.renderer.domElement.addEventListener('touchStart', (e) => {
 //   }
 // }
 function onSelectController(event) {
+  console.log(event)
+  let axis = event.inputSource.gamepad.axes
   console.log('on controller event', event)
-  const touch = new THREE.Vector2(0, 0)
-  touch.x = event.touches[0].pageX
-  touch.y = event.touches[0].pageY
+  const touch = new THREE.Vector2()
+  touch.x = axis[0]
+  touch.y = axis[1]
+  document.getElementById('status').innerHTML(`${touch.x},${touch.y}`)
   console.log(touch)
   checkIntersections(touch)
 
   // const targetRayPose = frame.
 
-  // const controllerPosition = new THREE.Vector3()
-  // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
+  const controllerPosition = new THREE.Vector3()
+  controllerPosition.setFromMatrixPosition(controller.matrixWorld)
 }
 
 // function testaddblocktoscene() {
@@ -90,10 +92,10 @@ function onSelectController(event) {
 
 
 //EVENT HANDLER FOR WINDOW TOUCH, DOES NOT WORK, ATLEAST NOT IN EMULATION 
-window.addEventListener('touchstart', (e) => { onTouch(e) })
-function onTouch(event) {
-  const { clientX, clientY } = event.touches[0]
-}
+// window.addEventListener('touchstart', (e) => { onTouch(e) })
+// function onTouch(event) {
+//   const { clientX, clientY } = event.touches[0]
+// }
 
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
