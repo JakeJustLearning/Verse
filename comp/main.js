@@ -50837,9 +50837,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helpers_animate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
 
 
-// import { renderer } from './components/renderer'
 // import { loadGLTF } from './components/loader'
-// import { getTargetRayPose, requestTargetRayInfo } from './helpers/targetRaySpace'
 
 
 
@@ -50851,16 +50849,13 @@ document.body.appendChild(container)
 const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_2__.initARApp)()
 
 arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"])
-let targetRayPose
 
 const selectRay = new three__WEBPACK_IMPORTED_MODULE_5__.Raycaster()
 
 function checkIntersections(origin, direction) {
   console.log('looking for intersection')
   selectRay.set(origin, direction)
-  console.log(arApp.scene.children)
   const intersects = selectRay.intersectObjects(arApp.scene.children)
-  console.log(intersects)
   const arrowHelper = new three__WEBPACK_IMPORTED_MODULE_5__.ArrowHelper(direction, origin, 1, 0xffff00)
   if (intersects[0]) {
     console.log('intersections found', intersects)
@@ -50877,55 +50872,18 @@ function checkIntersections(origin, direction) {
 // scene.add(wolf)
 
 
-
-
-// function handleSessionOnSelect(event) {
-//   console.log('onselect event happening')
-//   let source = event.inputSource
-//   if (arApp.session.hitTestSource) {
-
-//   }
-//   arApp.session.requestReferenceSpace('viewer')
-//     .then(viewerRefSpace => {
-//       if (viewerRewfSpace) {
-//         const targetRayPose = event.frame.getPose(source.targetRaySpace, viewerRefSpace)
-//         console.log(targetRayPose)
-//       }
-//     })
-//   // console.log('on session event', event)
-//   // console.log(event.frame)
-//   // console.log(arApp.session)
-//   // console.log(event.inputSource.targetRaySpace)
-//   // console.log(getTargetRayPose(event.frame, arApp.session, event.inputSource.targetRaySpace))
-// }
-// CREATE EVENT LISTENER FOR WEBXR SELECT EVENTs
-
 // function onSelect() {
 //   if (reticle.visible) {
 //     wolf.position.setFromMatrixPosition(reticle.matrix)
 //     wolf.visible = true
 //   }
 // }
+
 function onSelectController(event) {
-  console.log(arApp)
-  console.log(arApp.controller.position)
-  // const touchOrigin = new THREE.Vector3()
   const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
-  // touchOrigin.
   const cameraPosition = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3().setFromMatrixPosition(arApp.camera.matrixWorld)
-  const touchDirection = touchOrigin.clone()
-  // arApp.camera.getWorldDirection(touchDirection)
-  // touchDirection.subVectors(touchOrigin, touchDirection)
-  // touchDirection.subVectors(touchOrigin, touchDirection)
-
   const directionFromCamera = touchOrigin.clone().sub(cameraPosition).normalize()
-  touchDirection.add(directionFromCamera)
-
-  // touchOrigin.sub(arApp.camera.position).normalize()
-  // touchDirection.setFromMatrixPosition(arApp.controller.matrixWorld).makeTranslation(0, 0, -1)
-  console.log({ touchOrigin, directionFromCamera })
   checkIntersections(touchOrigin, directionFromCamera)
-
 }
 
 function renderARApp(timestamp, frame) {
