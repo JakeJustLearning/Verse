@@ -22,9 +22,14 @@ function checkIntersections(origin, direction) {
   // console.log('looking for intersection')
   selectRay.set(origin, direction)
   const intersects = selectRay.intersectObjects(arApp.scene.children)
-  const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
-  if (intersects[0]) intersects[0].object.rotateX(25)
-  arApp.scene.add(arrowHelper)
+  // const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
+  if (intersects[0]) {
+    intersects[0].object.rotateX(25)
+    intersects[0].object.material.color.set(0xffffff * Math.random())
+
+
+  }
+  // arApp.scene.add(arrowHelper)
 }
 
 

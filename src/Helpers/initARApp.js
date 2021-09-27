@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import OrbitControls from 'three/examples/jsm/controls/OrbitControls'
 import { initRenderer } from '../components/renderer'
 import { addResizeEventListener } from './resizeWindow.utility'
 import addStartObjectsToScene from './onSceneStartObjects'
@@ -20,6 +21,11 @@ export function initARApp() {
     .01,
     20
   )
+
+  arApp.controls = new OrbitControls(arApp.camera, arApp.renderer.domElement);
+  arApp.controls.target.set(0, 3.5, 0);
+  arApp.controls.update();
+
   arApp.controller = arApp.renderer.xr.getController(0)
   //IMPORTANT!
   arApp.scene.add(arApp.controller)
