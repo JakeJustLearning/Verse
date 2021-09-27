@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import OrbitControls from 'three/examples/jsm/controls/OrbitControls'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { initRenderer } from '../components/renderer'
 import { addResizeEventListener } from './resizeWindow.utility'
 import addStartObjectsToScene from './onSceneStartObjects'

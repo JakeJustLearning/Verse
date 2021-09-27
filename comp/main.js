@@ -328,7 +328,7 @@ function initARApp() {
     20
   )
 
-  arApp.controls = new three_examples_jsm_controls_OrbitControls__WEBPACK_IMPORTED_MODULE_0__["default"](arApp.camera, arApp.renderer.domElement);
+  arApp.controls = new three_examples_jsm_controls_OrbitControls__WEBPACK_IMPORTED_MODULE_0__.OrbitControls(arApp.camera, arApp.renderer.domElement);
   arApp.controls.target.set(0, 3.5, 0);
   arApp.controls.update();
 
