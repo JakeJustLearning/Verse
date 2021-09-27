@@ -215,6 +215,42 @@ class ARButton {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getTargetRayPose": () => (/* binding */ getTargetRayPose),
+/* harmony export */   "getTargetRayOrigin": () => (/* binding */ getTargetRayOrigin),
+/* harmony export */   "getTargetRayDirection": () => (/* binding */ getTargetRayDirection),
+/* harmony export */   "requestTargetRayInfo": () => (/* binding */ requestTargetRayInfo)
+/* harmony export */ });
+// help get target ray space information to be used for three.js rayscanner and intersection detection
+// Must be placed on an XRSession event inorder to get the necessary information!
+
+function getTargetRayPose(frame, session, targetRaySpace) {
+  // const viewerRefSpace = session ?
+  // // session.requestReferenceSpace('viewer') :
+  // const viewerRefSpace =  frame.session.requestReferenceSpace('viewer')
+  // return viewerRefSpace
+  return (
+    frame.getPose(targetRaySpace, frame.session.requestReferenceSpace('viewer'))
+  )
+}
+
+function getTargetRayOrigin(targetRayPose) {
+  return targetRayPose.transform.position
+}
+function getTargetRayDirection(targetRayPose) {
+  return targetRayPose.transform.orientation
+}
+
+function requestTargetRayInfo(frame, session, targetRaySpace) {
+  const rayPose = getTargetRayPose(frame, session, targetRaySpace)
+  return { rayOrigin: getTargetRayOrigin(rayPose), rayDirection: getTargetRayDirection(rayPose) }
+}
+
+/***/ }),
+/* 3 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "initHitTestSource": () => (/* binding */ initHitTestSource),
 /* harmony export */   "getHitTestResults": () => (/* binding */ getHitTestResults),
 /* harmony export */   "requestHitTestPoseMatrix": () => (/* binding */ requestHitTestPoseMatrix),
@@ -256,17 +292,17 @@ function updateObjectMatrixFromHit(object, hitMatrix) {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "initARApp": () => (/* binding */ initARApp)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
-/* harmony import */ var _components_renderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-/* harmony import */ var _resizeWindow_utility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
-/* harmony import */ var _onSceneStartObjects__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _components_renderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+/* harmony import */ var _resizeWindow_utility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var _onSceneStartObjects__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
 
 
 
@@ -305,7 +341,7 @@ function initARApp() {
 }
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -313,7 +349,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "renderer": () => (/* binding */ renderer),
 /* harmony export */   "initRenderer": () => (/* binding */ initRenderer)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
 
 
 const renderer = new three__WEBPACK_IMPORTED_MODULE_0__.WebGLRenderer({ antialias: true, alpha: true })
@@ -332,7 +368,7 @@ function initRenderer() {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -50662,7 +50698,7 @@ if ( typeof window !== 'undefined' ) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -50684,14 +50720,14 @@ function addResizeEventListener(arApp) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
 //organization and gathering of objects to be established and immidiately added to the scene at start
 
 
@@ -50736,14 +50772,14 @@ function addStartObjectsToScene(scene) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
 
 
 const reticle = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
@@ -50756,7 +50792,7 @@ reticle.visible = false
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (reticle);
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -50828,17 +50864,18 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
 /* harmony import */ var _components_ARButton__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var _helpers_initARApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
-/* harmony import */ var _components_reticle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8);
-/* harmony import */ var _helpers_animate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
+/* harmony import */ var _helpers_targetRaySpace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var _helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
+/* harmony import */ var _helpers_initARApp__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var _components_reticle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
+/* harmony import */ var _helpers_animate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(10);
 
 
 // import { renderer } from './components/renderer'
 // import { loadGLTF } from './components/loader'
-// import { getTargetRayPose, requestTargetRayInfo } from './helpers/targetRaySpace'
+
 
 
 
@@ -50847,28 +50884,52 @@ __webpack_require__.r(__webpack_exports__);
 const container = document.createElement('div');
 document.body.appendChild(container)
 
-const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_2__.initARApp)()
+const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_3__.initARApp)()
 
-arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"])
-const arrowHelper = new three__WEBPACK_IMPORTED_MODULE_5__.ArrowHelper(new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0), new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0), 2, 0xffff00)
-arrowHelper.visible = false
-arApp.scene.add(arrowHelper)
+arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"])
+// let targetRayPose
 
-const selectRay = new three__WEBPACK_IMPORTED_MODULE_5__.Raycaster()
+const selectRay = new three__WEBPACK_IMPORTED_MODULE_6__.Raycaster()
 
 function checkIntersections(origin, direction) {
   // console.log('looking for intersection')
   selectRay.set(origin, direction)
   const intersects = selectRay.intersectObjects(arApp.scene.children)
+  const arrowHelper = new three__WEBPACK_IMPORTED_MODULE_6__.ArrowHelper(direction, origin, 1, 0xffff00)
   if (intersects[0]) intersects[0].object.rotateX(25)
-  arrowHelper.position.set(origin)
-  arrowHelper.setDirection(direction)
-  arrowHelper.visible = true
+  arApp.scene.add(arrowHelper)
 }
+
+
+
 
 // const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
 // wolf.visible = false
 // scene.add(wolf)
+
+
+
+
+// function handleSessionOnSelect(event) {
+//   console.log('onselect event happening')
+//   let source = event.inputSource
+//   if (arApp.session.hitTestSource) {
+
+//   }
+//   arApp.session.requestReferenceSpace('viewer')
+//     .then(viewerRefSpace => {
+//       if (viewerRefSpace) {
+//         const targetRayPose = event.frame.getPose(source.targetRaySpace, viewerRefSpace)
+//         console.log(targetRayPose)
+//       }
+//     })
+//   // console.log('on session event', event)
+//   // console.log(event.frame)
+//   // console.log(arApp.session)
+//   // console.log(event.inputSource.targetRaySpace)
+//   // console.log(getTargetRayPose(event.frame, arApp.session, event.inputSource.targetRaySpace))
+// }
+// CREATE EVENT LISTENER FOR WEBXR SELECT EVENTs
 
 // function onSelect() {
 //   if (reticle.visible) {
@@ -50876,24 +50937,47 @@ function checkIntersections(origin, direction) {
 //     wolf.visible = true
 //   }
 // }
-
 async function onSelectController(event) {
-  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3()
+  console.log(event)
+  console.log(arApp.controller)
+  // let axis = event.inputSource.gamepad.axes
+  console.log('on controller event', event)
+  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3()
   touchOrigin.set(0, 0, 0).applyMatrix4(arApp.controller.matrixWorld)
-  const touchDirection = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3()
+  const touchDirection = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3()
   touchDirection.set(0, 0, -1).applyMatrix4(arApp.controller.matrixWorld)
+  console.log({ touchOrigin, touchDirection })
   checkIntersections(touchOrigin, touchDirection)
+
 }
+
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
-    const hitPoseMatrix = (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.requestHitTestPoseMatrix)(timestamp, frame, arApp.session, arApp.renderer)
+    // handle onSelect in renderFrame
+    // if (arApp.source.onSelect) {
+    //   let event = arApp.source.onSelect
+    //   // let frame = event.frame
+    //   let targetRaySpace = event.inputSource.targetRaySpace
+    //   let targetRayPose
+    //   arApp.session.requestReferenceSpace('viewer')
+    //     .then(refSpace => {
+    //       console.log({ targetRaySpace, refSpace, frame })
+    //       targetRayPose = frame.getPose(targetRaySpace, refSpace)
+    //       console.log(targetRayPose)
+    //       // console.log(targetPose)
+    //     })
+    // }
+
+
+    const hitPoseMatrix = (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.requestHitTestPoseMatrix)(timestamp, frame, arApp.session, arApp.renderer)
     if (hitPoseMatrix) {
-      (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.updateObjectMatrixFromHit)(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"], hitPoseMatrix)
-      _components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].visible = true
+      (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.updateObjectMatrixFromHit)(_components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"], hitPoseMatrix)
+      _components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"].visible = true
     } else {
-      _components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].visible = false
+      _components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"].visible = false
     }
   }
+  // arApp.source.onSelect = null
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 
@@ -50903,7 +50987,7 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
   },
   onStartCallback: async (session) => {
     arApp.session = session
-    await (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.initHitTestSource)(arApp.session)
+    await (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.initHitTestSource)(arApp.session)
     container.appendChild(arApp.renderer.domElement)
     arApp.controller = arApp.renderer.xr.getController(0)
     arApp.controller.addEventListener('select', (e) => {
@@ -50912,7 +50996,7 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
   },
 }))
 
-;(0,_helpers_animate__WEBPACK_IMPORTED_MODULE_4__["default"])(arApp, renderARApp)
+;(0,_helpers_animate__WEBPACK_IMPORTED_MODULE_5__["default"])(arApp, renderARApp)
 
 
 
