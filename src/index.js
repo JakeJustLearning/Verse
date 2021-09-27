@@ -75,10 +75,15 @@ function onSelectController(event) {
   // const touchOrigin = new THREE.Vector3()
   const touchOrigin = new THREE.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
   // touchOrigin.
-  const touchDirection = new THREE.Vector3()
-  arApp.camera.getWorldDirection(touchDirection)
-  touchDirection.subVectors(touchOrigin, touchDirection)
-  touchDirection.subVectors(touchOrigin, touchDirection)
+  const cameraPosition = new THREE.Vector3().setFromMatrixPosition(arApp.camera.matrixWorld)
+  const touchDirection = touchOrigin.clone()
+  // arApp.camera.getWorldDirection(touchDirection)
+  // touchDirection.subVectors(touchOrigin, touchDirection)
+  // touchDirection.subVectors(touchOrigin, touchDirection)
+
+  const directionFromCamera = touchOrigin.clone().sub(cameraPosition)
+  touchDirection.add(directionFromCamera)
+
   // touchOrigin.sub(arApp.camera.position).normalize()
   // touchDirection.setFromMatrixPosition(arApp.controller.matrixWorld).makeTranslation(0, 0, -1)
   console.log({ touchOrigin, touchDirection })
