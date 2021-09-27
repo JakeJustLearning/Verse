@@ -50883,6 +50883,7 @@ document.body.appendChild(container)
 const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_3__.initARApp)()
 
 arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"])
+let targetRayPose
 
 // const selectRay = new THREE.Raycaster()
 
@@ -50936,6 +50937,7 @@ arApp.controller.addEventListener('select', (e) => { onSelectController(e) })
 // }
 function onSelectController(event) {
   console.log('on controller event', event)
+  console.log(controller)
   // const touch = new THREE.Vector2(0, 0)
 
   // const targetRayPose = frame.
@@ -50955,15 +50957,17 @@ function onTouch(event) {
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
     //handle onSelect in renderFrame
-    if (arApp.source.onSelect) {
-      if (arApp.session.hitTestSource) {
-        let targetPose = frame.getPose(
-          arApp.source.onSelect.targetRaySpace,
-          arApp.session.hitTestSource
-        )
-        console.log(targetPose)
-      }
-    }
+    // if (arApp.source.onSelect) {
+    //   if (arApp.session.hitTestSource) {
+    //     let targetPose = frame.getPose(
+    //       arApp.source.onSelect.targetRaySpace,
+    //       arApp.session.hitTestSource
+    //     )
+    //     console.log(targetPose)
+    //   }
+    // }
+
+
     const hitPoseMatrix = (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.requestHitTestPoseMatrix)(timestamp, frame, arApp.session, arApp.renderer)
     if (hitPoseMatrix) {
       (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.updateObjectMatrixFromHit)(_components_reticle__WEBPACK_IMPORTED_MODULE_4__["default"], hitPoseMatrix)
@@ -50985,9 +50989,15 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
     ;(0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.initHitTestSource)(arApp.session)
     container.appendChild(arApp.renderer.domElement)
     // arApp.session.addEventListener('select', (e) => { onSelectSession(e) })
-    arApp.session.onselect = (event) => {
+    arApp.session.addEventListener((event) => {
+      if (event.inputSource.targetRayMode == 'screen') {
+        let targetRayPose = event.frame.getPose(event.inputSource.targetRaySpace, arApp.session.hitTestSource)
+        if (targetRayPose) {
+          console.log(targetRayPose)
+        }
+      }
       arApp.source.onSelect = event.inputSource
-    }
+    })
   },
 }))
 

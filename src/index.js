@@ -14,6 +14,7 @@ document.body.appendChild(container)
 const arApp = initARApp()
 
 arApp.scene.add(reticle)
+let targetRayPose
 
 // const selectRay = new THREE.Raycaster()
 
@@ -87,15 +88,17 @@ function onTouch(event) {
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
     //handle onSelect in renderFrame
-    if (arApp.source.onSelect) {
-      if (arApp.session.hitTestSource) {
-        let targetPose = frame.getPose(
-          arApp.source.onSelect.targetRaySpace,
-          arApp.session.hitTestSource
-        )
-        console.log(targetPose)
-      }
-    }
+    // if (arApp.source.onSelect) {
+    //   if (arApp.session.hitTestSource) {
+    //     let targetPose = frame.getPose(
+    //       arApp.source.onSelect.targetRaySpace,
+    //       arApp.session.hitTestSource
+    //     )
+    //     console.log(targetPose)
+    //   }
+    // }
+
+
     const hitPoseMatrix = requestHitTestPoseMatrix(timestamp, frame, arApp.session, arApp.renderer)
     if (hitPoseMatrix) {
       updateObjectMatrixFromHit(reticle, hitPoseMatrix)
@@ -117,9 +120,15 @@ document.body.appendChild(ARButton.createButton(arApp.renderer, {
     initHitTestSource(arApp.session)
     container.appendChild(arApp.renderer.domElement)
     // arApp.session.addEventListener('select', (e) => { onSelectSession(e) })
-    arApp.session.onselect = (event) => {
+    arApp.session.addEventListener((event) => {
+      if (event.inputSource.targetRayMode == 'screen') {
+        let targetRayPose = event.frame.getPose(event.inputSource.targetRaySpace, arApp.session.hitTestSource)
+        if (targetRayPose) {
+          console.log(targetRayPose)
+        }
+      }
       arApp.source.onSelect = event.inputSource
-    }
+    })
   },
 }))
 
