@@ -7,9 +7,7 @@ export function getTargetRayPose(frame, session, targetRaySpace) {
   // const viewerRefSpace =  frame.session.requestReferenceSpace('viewer')
   // return viewerRefSpace
   return (
-    session ?
-      session.getPose(targetRaySpace, frame.session.requestReferenceSpace('viewer')) :
-      frame.getPose(targetRaySpace, frame.session.requestReferenceSpace('viewer'))
+    frame.getPose(targetRaySpace, frame.session.requestReferenceSpace('viewer'))
   )
 }
 
