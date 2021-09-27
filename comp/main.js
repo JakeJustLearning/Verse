@@ -50886,11 +50886,13 @@ let targetRayPose
 
 const selectRay = new three__WEBPACK_IMPORTED_MODULE_6__.Raycaster()
 
-function checkIntersections(screenPos) {
+function checkIntersections(origin, direction) {
   // console.log('looking for intersection')
-  selectRay.setFromCamera(screenPos, arApp.camera)
+  selectRay.set(origin, direction)
   const intersects = selectRay.intersectObjects(arApp.scene.children)
   if (intersects[0]) intersects[0].object.rotateX(25)
+  const arrowHelper = new three__WEBPACK_IMPORTED_MODULE_6__.ArrowHelper(direction, origin, 1, 0xffff00)
+  arApp.scene.add(arrowHelper)
 }
 
 
@@ -50932,21 +50934,26 @@ arApp.controller.addEventListener('select', (e) => {
 //     wolf.visible = true
 //   }
 // }
-function onSelectController(event) {
+async function onSelectController(event) {
   console.log(event)
-  let axis = event.inputSource.gamepad.axes
+  console.log(arApp.controller)
+  // let axis = event.inputSource.gamepad.axes
   console.log('on controller event', event)
-  const touch = new three__WEBPACK_IMPORTED_MODULE_6__.Vector2()
-  touch.x = axis[0]
-  touch.y = axis[1]
-  document.getElementById('status').innerHTML(`${touch.x},${touch.y}`)
-  console.log(touch)
-  checkIntersections(touch)
+  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3(0, 0, 0).applyMatrix4(arApp.controller.matrixWorld)
+  const touchDirection = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3(0, 0, -1).applyMatrix4(arApp.controller.matrixWorld)
+  // touch.x = axis[0]
+  // touch.y = axis[1]
+  // const refSpace = await event.frame.session.requestReferenceSpace('viewer')
+  // const pose = event.frame.getPose(event.inputSource.targetRaySpace, refSpace)
+  // document.getElementById('status').innerHTML(`${touch.x},${touch.y}`)
+  // console.log(pose)
+  // console.log(touch)
+  checkIntersections(touchOrigin, touchDirection)
 
   // const targetRayPose = frame.
 
-  const controllerPosition = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3()
-  controllerPosition.setFromMatrixPosition(controller.matrixWorld)
+  // const controllerPosition = new THREE.Vector3()
+  // controllerPosition.setFromMatrixPosition(controller.matrixWorld)
 }
 
 // function testaddblocktoscene() {
@@ -51003,6 +51010,9 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
     arApp.session = session
     await (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_2__.initHitTestSource)(arApp.session)
     container.appendChild(arApp.renderer.domElement)
+    // arApp.session.addEventListener('select', (e) => {
+    //   onSelectController(e)
+    // })
     // arApp.session.addEventListener('select', (e) => { onSelectSession(e) })
     // arApp.session.addEventListener('select', (event) => {
     //   if (event.inputSource.targetRayMode == 'screen') {
