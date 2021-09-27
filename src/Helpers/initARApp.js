@@ -8,6 +8,7 @@ import addStartObjectsToScene from './onSceneStartObjects'
 export function initARApp() {
 
   const arApp = {}
+  arApp.source = {}
 
   arApp.renderer = initRenderer()
 

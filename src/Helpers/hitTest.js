@@ -1,11 +1,11 @@
 export function initHitTestSource(session) {
-  if (!session.hitTestSourceReqeusted) {
+  if (!session.hitTestSourceRequested) {
     session.requestReferenceSpace('viewer')
       .then(referenceSpace => {
         session.requestHitTestSource({ space: referenceSpace })
           .then(source => {
             session.addEventListener('end', function () {
-              session.hitTestSourceReqeusted = false
+              session.hitTestSourceRequested = false
               session.hittestSource = null
             })
             session.hitTestSource = source

@@ -33,7 +33,6 @@ const boxThree = new THREE.Mesh(
 )
 boxThree.position.set(1.5, 0, - 1)
 startObjects.push(...[boxOne, boxTwo, boxThree])
-console.log(startObjects)
 
 function addStartObjectsToScene(scene) {
   startObjects.forEach(obj => scene.add(obj))

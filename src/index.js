@@ -1,8 +1,8 @@
-import * as THREE from 'three'
+// import * as THREE from 'three'
 import { ARButton } from './components/ARButton'
-import { renderer } from './components/renderer'
-import { loadGLTF } from './components/loader'
-import { requestTargetRayInfo } from './helpers/targetRaySpace'
+// import { renderer } from './components/renderer'
+// import { loadGLTF } from './components/loader'
+import { getTargetRayPose, requestTargetRayInfo } from './helpers/targetRaySpace'
 import { initHitTestSource, requestHitTestPoseMatrix, updateObjectMatrixFromHit } from './helpers/hitTest'
 import { initARApp } from './helpers/initARApp'
 import reticle from './components/reticle'
@@ -37,11 +37,27 @@ arApp.scene.add(reticle)
 
 
 
-// let session = renderer.xr.getSession()
-// session.addEventListener('select', (e) => onSelectSession(e))
-// function onSelectSession(event) {
-//}
-// CREATE EVENT LISTENER FOR WEBXR SELECT EVENT
+
+// function handleSessionOnSelect(event) {
+//   console.log('onselect event happening')
+//   let source = event.inputSource
+//   if (arApp.session.hitTestSource) {
+
+//   }
+//   arApp.session.requestReferenceSpace('viewer')
+//     .then(viewerRefSpace => {
+//       if (viewerRefSpace) {
+//         const targetRayPose = event.frame.getPose(source.targetRaySpace, viewerRefSpace)
+//         console.log(targetRayPose)
+//       }
+//     })
+//   // console.log('on session event', event)
+//   // console.log(event.frame)
+//   // console.log(arApp.session)
+//   // console.log(event.inputSource.targetRaySpace)
+//   // console.log(getTargetRayPose(event.frame, arApp.session, event.inputSource.targetRaySpace))
+// }
+// CREATE EVENT LISTENER FOR WEBXR SELECT EVENTs
 arApp.controller.addEventListener('select', (e) => { onSelectController(e) })
 // function onSelect() {
 //   if (reticle.visible) {
@@ -50,6 +66,8 @@ arApp.controller.addEventListener('select', (e) => { onSelectController(e) })
 //   }
 // }
 function onSelectController(event) {
+  console.log('on controller event', event)
+  console.log(controller)
   // const touch = new THREE.Vector2(0, 0)
 
   // const targetRayPose = frame.
@@ -68,6 +86,16 @@ function onTouch(event) {
 
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
+    //handle onSelect in renderFrame
+    if (arApp.source.onSelect) {
+      if (arApp.session.hitTestSource) {
+        let targetPose = frame.getPose(
+          arApp.source.onSelect.targetRaySpace,
+          arApp.session.hitTestSource
+        )
+        console.log(targetPose)
+      }
+    }
     const hitPoseMatrix = requestHitTestPoseMatrix(timestamp, frame, arApp.session, arApp.renderer)
     if (hitPoseMatrix) {
       updateObjectMatrixFromHit(reticle, hitPoseMatrix)
@@ -76,6 +104,7 @@ function renderARApp(timestamp, frame) {
       reticle.visible = false
     }
   }
+  arApp.source.onSelect = null
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 
@@ -87,6 +116,10 @@ document.body.appendChild(ARButton.createButton(arApp.renderer, {
     arApp.session = session
     initHitTestSource(arApp.session)
     container.appendChild(arApp.renderer.domElement)
+    // arApp.session.addEventListener('select', (e) => { onSelectSession(e) })
+    arApp.session.onselect = (event) => {
+      arApp.source.onSelect = event.inputSource
+    }
   },
 }))
 

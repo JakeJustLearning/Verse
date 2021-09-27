@@ -1,13 +1,16 @@
 // help get target ray space information to be used for three.js rayscanner and intersection detection
+// Must be placed on an XRSession event inorder to get the necessary information!
 
-
-export function getTargetRaySpace(event) {
-  return event.data[Object.getOwnPropertySymbols(event.data)[0]].targetRaySpaces
-}
-
-export function getTargetRayPose(frame, targetRaySpaces) {
-  const viewerRefSpace = frame.session.requestReferenceSpace('viewer')
-  return frame.session.getPose(targetRaySpaces, viewerRefSpace)
+export function getTargetRayPose(frame, session, targetRaySpace) {
+  // const viewerRefSpace = session ?
+  // // session.requestReferenceSpace('viewer') :
+  // const viewerRefSpace =  frame.session.requestReferenceSpace('viewer')
+  // return viewerRefSpace
+  return (
+    session ?
+      session.getPose(targetRaySpace, frame.session.requestReferenceSpace('viewer')) :
+      frame.getPose(targetRaySpace, frame.session.requestReferenceSpace('viewer'))
+  )
 }
 
 export function getTargetRayOrigin(targetRayPose) {
@@ -17,7 +20,7 @@ export function getTargetRayDirection(targetRayPose) {
   return targetRayPose.transform.orientation
 }
 
-export function requestTargetRayInfo(event, frame) {
-  const rayPose = getTargetRayPose(frame, getTargetRaySpace(event))
+export function requestTargetRayInfo(frame, session, targetRaySpace) {
+  const rayPose = getTargetRayPose(frame, session, targetRaySpace)
   return { rayOrigin: getTargetRayOrigin(rayPose), rayDirection: getTargetRayDirection(rayPose) }
 }
