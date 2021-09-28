@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { ARButton } from './components/ARButton'
-// import { loadGLTF } from './components/loader'
 import { initHitTestSource, requestHitTestPoseMatrix, updateObjectMatrixFromHit } from './helpers/hitTest'
 import { initARApp } from './helpers/initARApp'
 import reticle from './components/reticle'
@@ -16,31 +15,26 @@ arApp.scene.add(reticle)
 const selectRay = new THREE.Raycaster()
 
 function checkIntersections(origin, direction) {
-  console.log('looking for intersection')
+  // console.log('looking for intersection')
   selectRay.set(origin, direction)
   const intersects = selectRay.intersectObjects(arApp.scene.children)
-  const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
+  // const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
   if (intersects[0]) {
-    console.log('intersections found', intersects)
-    intersects[0].object.material.color.set(0xffffff * Math.random())
+    let intersection = intersects[0]
+    console.log('intersections found', intersection)
+    intersection.object.material.color.set(0xffffff * Math.random())
+    arApp.selectedObject = intersection
   }
-  arApp.scene.add(arrowHelper)
+  // arApp.scene.add(arrowHelper)
 }
 
-
-
-
-// const wolf = await loadGLTF('./assets/wolf_gltf/Wolf-Blender-2.82a.gltf')
-// wolf.visible = false
-// scene.add(wolf)
-
-
-// function onSelect() {
-//   if (reticle.visible) {
-//     wolf.position.setFromMatrixPosition(reticle.matrix)
-//     wolf.visible = true
-//   }
-// }
+function placeModel(name) {
+  let model = arApp.scene.getObjectByName(name)
+  if (reticle.visible) {
+    model.position.setFromMatrixPosition(reticle.matrix)
+    model.visible = true
+  }
+}
 
 function onSelectController(event) {
   const touchOrigin = new THREE.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
@@ -59,6 +53,8 @@ function renderARApp(timestamp, frame) {
       reticle.visible = false
     }
   }
+  // arApp.hud.updateHudPosition()
+  console.log(arApp.scene.children)
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 
@@ -73,6 +69,7 @@ document.body.appendChild(ARButton.createButton(arApp.renderer, {
     arApp.controller = arApp.renderer.xr.getController(0)
     arApp.controller.addEventListener('select', (e) => {
       onSelectController(e)
+      // placeModel('wolf')
     })
   },
 }))
