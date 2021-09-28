@@ -19,6 +19,7 @@ export function createHudButtons(arApp) {
 }
 
 function createModelButton(path, name, buttonGroup, scaleFactor) {
+  console.log(path, name)
   // const outerButtonBox = new THREE.Box3
   function onButtonModelLoad(model) {
     console.log(model)
@@ -30,7 +31,7 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
     buttonGroup.add(scaledModel)
     scaledModel.name = name
     scaledModel.visible = true
-    scaledModel.position.set(-.05, .05, -.35)
+    scaledModel.position.set(-.05, .05, -.35 + (buttonGroup.userData.lastBox?.position?.x || 0))
     buttonGroup.userData.lastBox = scaledModel
   }
   loadGLTF(path, name, onButtonModelLoad)

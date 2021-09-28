@@ -29,7 +29,7 @@ const boxThree = new THREE.Mesh(
   new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() })
 )
 boxThree.position.set(1.5, 0, - 1)
-startObjects.push(...[boxThree])
+startObjects.push(...[boxThree, boxTwo, boxThree])
 
 function addStartObjectsToScene(scene) {
   startObjects.forEach(obj => scene.add(obj))

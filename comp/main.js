@@ -304,7 +304,9 @@ function initARApp() {
   ;(0,_onSceneStartObjects__WEBPACK_IMPORTED_MODULE_3__["default"])(arApp.scene)
 
   arApp.assets = [
-    { name: 'wolf', path: '/assets/wolf_gltf/Wolf-Blender-2.82a.gltf' }
+    { name: 'wolf', path: '/assets/wolf_gltf/Wolf-Blender-2.82a.gltf' },
+    // { name: 'creeper', path: '/assets/creeper/Creeper.glb' },
+    // { name: 'badIdea', path: '/assets/badIdea/PM_Idea_glb/PM_Baked_idea_4-21-20_05.glb' }
   ]
 
   arApp.hud = (0,_components_hud__WEBPACK_IMPORTED_MODULE_4__.createHudButtons)(arApp)
@@ -50718,7 +50720,6 @@ function loadGLTF(path, name, onLoaded) {
     (gltf) => {
       gltf.clone = () => { gltf.scene.clone(true) }
       gltf.scene.name = name
-      console.log(gltf.scene.children)
       onLoaded(gltf)
       loader.loading = false
     },
@@ -54951,7 +54952,7 @@ const boxThree = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
   new three__WEBPACK_IMPORTED_MODULE_0__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
 )
 boxThree.position.set(1.5, 0, - 1)
-startObjects.push(...[boxThree])
+startObjects.push(...[boxThree, boxTwo, boxThree])
 
 function addStartObjectsToScene(scene) {
   startObjects.forEach(obj => scene.add(obj))
@@ -54991,6 +54992,7 @@ function createHudButtons(arApp) {
 }
 
 function createModelButton(path, name, buttonGroup, scaleFactor) {
+  console.log(path, name)
   // const outerButtonBox = new THREE.Box3
   function onButtonModelLoad(model) {
     console.log(model)
@@ -55002,7 +55004,7 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
     buttonGroup.add(scaledModel)
     scaledModel.name = name
     scaledModel.visible = true
-    scaledModel.position.set(-.05, .05, -.35)
+    scaledModel.position.set(-.05, .05, -.35 + (buttonGroup.userData.lastBox?.position?.x || 0))
     buttonGroup.userData.lastBox = scaledModel
   }
   (0,_components_loader__WEBPACK_IMPORTED_MODULE_0__.loadGLTF)(path, name, onButtonModelLoad)
@@ -55081,26 +55083,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 
 function routeSelect(arApp, selectedObject) {
-  if (arApp.selectedObject?.userData.isPlaceable) {
+  if (!selectedObject?.isPlaceable && selectedObject) {
+    arApp.selectedObject = selectedObject
+  }
+  else if (arApp.selectedObject?.userData.isPlaceable) {
     if (arApp.selectedObject === selectedObject) {
       arApp.selectedObject = null
     } else {
       placeSelectedObject(arApp, arApp.selectedObject, arApp.scene.getObjectByName('reticle'))
     }
   } else {
-    arApp.selectedObject = selectedObject || null
+    arApp.selectedObject = null
   }
 }
 
 
 
 function placeSelectedObject(arApp, object, reticle) {
-  console.log('into the clone')
   object.cloneGLTF((gltf) => {
     let model = gltf.scene.children[0]
     model.position.setFromMatrixPosition(reticle.matrix)
     arApp.scene.add(model)
-    console.log(arApp.scene.children)
   })
 }
 
@@ -55204,7 +55207,7 @@ function checkIntersections(origin, direction) {
   if (intersects[0]) {
     let intersection = intersects[0].object
     console.log('intersections found', intersection)
-    // intersection.object.material.color.set(0xffffff * Math.random())
+    intersection.material.color.set(0xffffff * Math.random())
 
     return intersection
   }

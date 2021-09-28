@@ -12,7 +12,6 @@ export function loadGLTF(path, name, onLoaded) {
     (gltf) => {
       gltf.clone = () => { gltf.scene.clone(true) }
       gltf.scene.name = name
-      console.log(gltf.scene.children)
       onLoaded(gltf)
       loader.loading = false
     },

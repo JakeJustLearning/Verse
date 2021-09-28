@@ -23,7 +23,7 @@ function checkIntersections(origin, direction) {
   if (intersects[0]) {
     let intersection = intersects[0].object
     console.log('intersections found', intersection)
-    // intersection.object.material.color.set(0xffffff * Math.random())
+    intersection.material.color.set(0xffffff * Math.random())
 
     return intersection
   }
