@@ -304,7 +304,7 @@ function initARApp() {
   ;(0,_onSceneStartObjects__WEBPACK_IMPORTED_MODULE_3__["default"])(arApp.scene)
 
   arApp.assets = [
-    { name: 'wolf', path: '/assets/wolf_gltf/Wolf-Blender-2.82a.gltf' },
+    { name: 'wolf', path: '../src/assets/wolf_gltf/Wolf-Blender-2.82a.gltf' },
     // { name: 'creeper', path: '/assets/creeper/Creeper.glb' },
     // { name: 'badIdea', path: '/assets/badIdea/PM_Idea_glb/PM_Baked_idea_4-21-20_05.glb' }
   ]
