@@ -54976,7 +54976,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function createHudButtons(arApp) {
-  const scaleFactor = 1
+  const scaleFactor = .01
   const hud = {}
   const buttonGroupHud = new three__WEBPACK_IMPORTED_MODULE_1__.Group()
   // buttonGroupHud.position.set(0, 0, -.35)
@@ -55003,7 +55003,7 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
     // buttonGroup.add(outerButtonBox)
     buttonGroup.add(scaledModel)
     scaledModel.visible = true
-    scaledModel.position.set(0, .2, -1)
+    scaledModel.position.set(-.1, .12, -.34)
     buttonGroup.userData.lastBox = scaledModel
   }
   (0,_components_loader__WEBPACK_IMPORTED_MODULE_0__.loadGLTF)(path, name, onButtonModelLoad)
@@ -55011,6 +55011,11 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
 
 
 function scaleModelToButton(model, scaleFactor) {
+  const bbbox = new three__WEBPACK_IMPORTED_MODULE_1__.Mesh(
+    new three__WEBPACK_IMPORTED_MODULE_1__.BoxBufferGeometry(.5, .5, .5),
+    new three__WEBPACK_IMPORTED_MODULE_1__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
+  )
+  // model = bbbox
   console.log(model)
   let box = new three__WEBPACK_IMPORTED_MODULE_1__.Box3().setFromObject(model)
   let max = box.max
@@ -55021,7 +55026,8 @@ function scaleModelToButton(model, scaleFactor) {
   }
   dif.x > dif.y ? dif.high = 'x' : dif.high = 'y'
   model.userData.scaled = dif[dif.high] / scaleFactor
-  model.scale.set(new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(model.userData.scaled, model.userData.scaled, model.userData.scaled))
+  console.log(model.userData.scaled)
+  model.scale.set(model.userData.scaled, model.userData.scaled, model.userData.scaled)
   return model
 }
 
@@ -55182,7 +55188,6 @@ function renderARApp(timestamp, frame) {
     }
   }
   // arApp.hud.updateHudPosition()
-  console.log(arApp.scene.children)
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 

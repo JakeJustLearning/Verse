@@ -54,7 +54,6 @@ function renderARApp(timestamp, frame) {
     }
   }
   // arApp.hud.updateHudPosition()
-  console.log(arApp.scene.children)
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 

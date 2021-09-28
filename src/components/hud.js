@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { loadGLTF } from '../components/loader'
 
 export function createHudButtons(arApp) {
-  const scaleFactor = 1
+  const scaleFactor = .01
   const hud = {}
   const buttonGroupHud = new THREE.Group()
   // buttonGroupHud.position.set(0, 0, -.35)
@@ -30,7 +30,7 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
     // buttonGroup.add(outerButtonBox)
     buttonGroup.add(scaledModel)
     scaledModel.visible = true
-    scaledModel.position.set(0, .2, -1)
+    scaledModel.position.set(-.1, .12, -.34)
     buttonGroup.userData.lastBox = scaledModel
   }
   loadGLTF(path, name, onButtonModelLoad)
@@ -38,6 +38,11 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
 
 
 function scaleModelToButton(model, scaleFactor) {
+  const bbbox = new THREE.Mesh(
+    new THREE.BoxBufferGeometry(.5, .5, .5),
+    new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() })
+  )
+  // model = bbbox
   console.log(model)
   let box = new THREE.Box3().setFromObject(model)
   let max = box.max
@@ -48,7 +53,8 @@ function scaleModelToButton(model, scaleFactor) {
   }
   dif.x > dif.y ? dif.high = 'x' : dif.high = 'y'
   model.userData.scaled = dif[dif.high] / scaleFactor
-  model.scale.set(new THREE.Vector3(model.userData.scaled, model.userData.scaled, model.userData.scaled))
+  console.log(model.userData.scaled)
+  model.scale.set(model.userData.scaled, model.userData.scaled, model.userData.scaled)
   return model
 }
 
