@@ -54952,7 +54952,7 @@ const boxThree = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
   new three__WEBPACK_IMPORTED_MODULE_0__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
 )
 boxThree.position.set(1.5, 0, - 1)
-startObjects.push(...[boxOne, boxTwo, boxThree])
+startObjects.push(...[boxThree])
 
 function addStartObjectsToScene(scene) {
   startObjects.forEach(obj => scene.add(obj))
@@ -54976,10 +54976,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function createHudButtons(arApp) {
-  const scaleFactor = .1
+  const scaleFactor = 1
   const hud = {}
   const buttonGroupHud = new three__WEBPACK_IMPORTED_MODULE_1__.Group()
-  buttonGroupHud.position.set(0, 0, -.35)
+  // buttonGroupHud.position.set(0, 0, -.35)
 
   hud.updateHudPosition = () => {
     buttonGroupHud.position.applyMatrix4(arApp.camera.matrixWorld)
@@ -54987,7 +54987,7 @@ function createHudButtons(arApp) {
   }
 
   arApp.assets.forEach(asset => {
-    createModelButton(asset.path, asset.name, buttonGroupHud, scaleFactor)
+    createModelButton(asset.path, asset.name, arApp.scene, scaleFactor)
   })
 
   arApp.scene.add(buttonGroupHud)
@@ -55002,7 +55002,8 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
     // outerButtonBox.setFromObject(scaledModel)
     // buttonGroup.add(outerButtonBox)
     buttonGroup.add(scaledModel)
-    scaledModel.position.set(0, .2, -.35)
+    scaledModel.visible = true
+    scaledModel.position.set(0, .2, -1)
     buttonGroup.userData.lastBox = scaledModel
   }
   (0,_components_loader__WEBPACK_IMPORTED_MODULE_0__.loadGLTF)(path, name, onButtonModelLoad)
