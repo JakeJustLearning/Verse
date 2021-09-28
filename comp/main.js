@@ -54976,7 +54976,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function createHudButtons(arApp) {
-  const scaleFactor = .01
+  const scaleFactor = .1
   const hud = {}
   const buttonGroupHud = new three__WEBPACK_IMPORTED_MODULE_1__.Group()
   // buttonGroupHud.position.set(0, 0, -.35)
@@ -54987,23 +54987,23 @@ function createHudButtons(arApp) {
   }
 
   arApp.assets.forEach(asset => {
-    createModelButton(asset.path, asset.name, arApp.scene, scaleFactor)
+    createModelButton(asset.path, asset.name, buttonGroupHud, scaleFactor)
   })
 
   arApp.scene.add(buttonGroupHud)
+  console.log('all my kids', arApp.scene.children)
   return hud
 }
 
 function createModelButton(path, name, buttonGroup, scaleFactor) {
   // const outerButtonBox = new THREE.Box3
   function onButtonModelLoad(model) {
-    console.log('in create button', model)
     const scaledModel = scaleModelToButton(model.scene.children[0], scaleFactor)
     // outerButtonBox.setFromObject(scaledModel)
     // buttonGroup.add(outerButtonBox)
     buttonGroup.add(scaledModel)
     scaledModel.visible = true
-    scaledModel.position.set(-.1, .12, -.34)
+    scaledModel.position.set(-.05, .05, -.35)
     buttonGroup.userData.lastBox = scaledModel
   }
   (0,_components_loader__WEBPACK_IMPORTED_MODULE_0__.loadGLTF)(path, name, onButtonModelLoad)
@@ -55011,11 +55011,6 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
 
 
 function scaleModelToButton(model, scaleFactor) {
-  const bbbox = new three__WEBPACK_IMPORTED_MODULE_1__.Mesh(
-    new three__WEBPACK_IMPORTED_MODULE_1__.BoxBufferGeometry(.5, .5, .5),
-    new three__WEBPACK_IMPORTED_MODULE_1__.MeshBasicMaterial({ color: 0xffffff * Math.random() })
-  )
-  // model = bbbox
   console.log(model)
   let box = new three__WEBPACK_IMPORTED_MODULE_1__.Box3().setFromObject(model)
   let max = box.max
@@ -55025,10 +55020,18 @@ function scaleModelToButton(model, scaleFactor) {
     y: max.y - min.y
   }
   dif.x > dif.y ? dif.high = 'x' : dif.high = 'y'
-  model.userData.scaled = dif[dif.high] / scaleFactor
+  model.userData.scaled = dif[dif.high] * scaleFactor
   console.log(model.userData.scaled)
   model.scale.set(model.userData.scaled, model.userData.scaled, model.userData.scaled)
-  return model
+  // const bbox = new THREE.Box3().setFromObject(model)
+  const mesh = new three__WEBPACK_IMPORTED_MODULE_1__.Mesh(
+    new three__WEBPACK_IMPORTED_MODULE_1__.BoxGeometry(scaleFactor, scaleFactor, scaleFactor),
+    new three__WEBPACK_IMPORTED_MODULE_1__.MeshBasicMaterial({ color: 'green', opacity: 0.5 })
+  )
+  mesh.add(model)
+  mesh.geometry.computeBoundingBox()
+  // model.geometry.computeBoundingBox()
+  return mesh
 }
 
 
@@ -55158,7 +55161,7 @@ function checkIntersections(origin, direction) {
     console.log('intersections found', intersection)
     intersection.object.material.color.set(0xffffff * Math.random())
     arApp.selectedObject = intersection
-  }
+  } else { arApp.selectedObject = null }
   // arApp.scene.add(arrowHelper)
 }
 
@@ -55188,6 +55191,9 @@ function renderARApp(timestamp, frame) {
     }
   }
   // arApp.hud.updateHudPosition()
+  if (arApp.selectedObject) {
+    spinSelectedObject(arApp.selectedObject.object)
+  }
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 
@@ -55209,6 +55215,11 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
 
 ;(0,_helpers_animate__WEBPACK_IMPORTED_MODULE_4__["default"])(arApp, renderARApp)
 
+
+function spinSelectedObject(object) {
+  object.rotateX(.2)
+  object.rotateY(.1)
+}
 
 
 })();

@@ -24,7 +24,7 @@ function checkIntersections(origin, direction) {
     console.log('intersections found', intersection)
     intersection.object.material.color.set(0xffffff * Math.random())
     arApp.selectedObject = intersection
-  }
+  } else { arApp.selectedObject = null }
   // arApp.scene.add(arrowHelper)
 }
 
@@ -54,6 +54,9 @@ function renderARApp(timestamp, frame) {
     }
   }
   // arApp.hud.updateHudPosition()
+  if (arApp.selectedObject) {
+    spinSelectedObject(arApp.selectedObject.object)
+  }
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
 
@@ -75,4 +78,9 @@ document.body.appendChild(ARButton.createButton(arApp.renderer, {
 
 animate(arApp, renderARApp)
 
+
+function spinSelectedObject(object) {
+  object.rotateX(.2)
+  object.rotateY(.1)
+}
 
