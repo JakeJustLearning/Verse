@@ -50716,6 +50716,7 @@ function loadGLTF(path, name, onLoaded) {
   loader.load(
     path,
     (gltf) => {
+      gltf.clone = () => { gltf.scene.clone(true) }
       gltf.scene.name = name
       console.log(gltf.scene.children)
       onLoaded(gltf)
@@ -54925,8 +54926,7 @@ __webpack_require__.r(__webpack_exports__);
 const startObjects = []
 
 // LIGHTS!
-const light = new three__WEBPACK_IMPORTED_MODULE_0__.HemisphereLight(0xffffbb, 0x080820)
-light.position.set(0.5, 1, 0.25)
+const light = new three__WEBPACK_IMPORTED_MODULE_0__.HemisphereLight(0x606060, 0x404040)
 startObjects.push(light)
 
 const directionalLight = new three__WEBPACK_IMPORTED_MODULE_0__.DirectionalLight(0xffffff)
@@ -54934,7 +54934,6 @@ directionalLight.position.set(0.2, 1, 1).normalize()
 startObjects.push(directionalLight)
 
 // Test Boxes
-
 
 const boxOne = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
   new three__WEBPACK_IMPORTED_MODULE_0__.BoxGeometry(.2, .2, .2),
@@ -54978,30 +54977,30 @@ __webpack_require__.r(__webpack_exports__);
 function createHudButtons(arApp) {
   const scaleFactor = .1
   const hud = {}
-  const buttonGroupHud = new three__WEBPACK_IMPORTED_MODULE_1__.Group()
   // buttonGroupHud.position.set(0, 0, -.35)
 
-  hud.updateHudPosition = () => {
-    buttonGroupHud.position.applyMatrix4(arApp.camera.matrixWorld)
-    buttonGroupHud.quaternion.setFromRotationMatrix(arApp.camera.matrixWorld)
-  }
+  // hud.updateHudPosition = () => {
+  //   buttonGroupHud.position.applyMatrix4(arApp.camera.matrixWorld)
+  //   buttonGroupHud.quaternion.setFromRotationMatrix(arApp.camera.matrixWorld)
+  // }
 
   arApp.assets.forEach(asset => {
-    createModelButton(asset.path, asset.name, buttonGroupHud, scaleFactor)
+    createModelButton(asset.path, asset.name, arApp.scene, scaleFactor)
   })
-
-  arApp.scene.add(buttonGroupHud)
-  console.log('all my kids', arApp.scene.children)
   return hud
 }
 
 function createModelButton(path, name, buttonGroup, scaleFactor) {
   // const outerButtonBox = new THREE.Box3
   function onButtonModelLoad(model) {
+    console.log(model)
     const scaledModel = scaleModelToButton(model.scene.children[0], scaleFactor)
+    scaledModel.cloneGLTF = (onLoad) => {
+      ;(0,_components_loader__WEBPACK_IMPORTED_MODULE_0__.loadGLTF)(path, name, onLoad)
+    }
     // outerButtonBox.setFromObject(scaledModel)
-    // buttonGroup.add(outerButtonBox)
     buttonGroup.add(scaledModel)
+    scaledModel.name = name
     scaledModel.visible = true
     scaledModel.position.set(-.05, .05, -.35)
     buttonGroup.userData.lastBox = scaledModel
@@ -55011,7 +55010,7 @@ function createModelButton(path, name, buttonGroup, scaleFactor) {
 
 
 function scaleModelToButton(model, scaleFactor) {
-  console.log(model)
+  model.animations = null
   let box = new three__WEBPACK_IMPORTED_MODULE_1__.Box3().setFromObject(model)
   let max = box.max
   let min = box.min
@@ -55021,15 +55020,18 @@ function scaleModelToButton(model, scaleFactor) {
   }
   dif.x > dif.y ? dif.high = 'x' : dif.high = 'y'
   model.userData.scaled = dif[dif.high] * scaleFactor
-  console.log(model.userData.scaled)
   model.scale.set(model.userData.scaled, model.userData.scaled, model.userData.scaled)
   // const bbox = new THREE.Box3().setFromObject(model)
   const mesh = new three__WEBPACK_IMPORTED_MODULE_1__.Mesh(
-    new three__WEBPACK_IMPORTED_MODULE_1__.BoxGeometry(scaleFactor, scaleFactor, scaleFactor),
-    new three__WEBPACK_IMPORTED_MODULE_1__.MeshBasicMaterial({ color: 'green', opacity: 0.5 })
+    new three__WEBPACK_IMPORTED_MODULE_1__.BoxGeometry(.05, .05, .05)
+    // new THREE.MeshBasicMaterial({ color: 'green', opacity: 0.0 })
   )
+  mesh.position.setFromMatrixPosition(model.matrixWorld)
+  // mesh.material.visible = false
+  mesh.material.wireframe = true
   mesh.add(model)
-  mesh.geometry.computeBoundingBox()
+  model.translateY(-.025)
+  mesh.userData.isPlaceable = true
   // model.geometry.computeBoundingBox()
   return mesh
 }
@@ -55053,6 +55055,7 @@ const reticle = new three__WEBPACK_IMPORTED_MODULE_0__.Mesh(
 )
 reticle.matrixAutoUpdate = false
 reticle.visible = false
+reticle.name = 'reticle'
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (reticle);
 
@@ -55067,6 +55070,46 @@ __webpack_require__.r(__webpack_exports__);
 function animate(arApp, renderFunc) {
   arApp.renderer.setAnimationLoop(renderFunc)
 }
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+
+function routeSelect(arApp, selectedObject) {
+  if (arApp.selectedObject?.userData.isPlaceable) {
+    if (arApp.selectedObject === selectedObject) {
+      arApp.selectedObject = null
+    } else {
+      placeSelectedObject(arApp, arApp.selectedObject, arApp.scene.getObjectByName('reticle'))
+    }
+  } else {
+    arApp.selectedObject = selectedObject || null
+  }
+}
+
+
+
+function placeSelectedObject(arApp, object, reticle) {
+  console.log('into the clone')
+  object.cloneGLTF((gltf) => {
+    let model = gltf.scene.children[0]
+    model.position.setFromMatrixPosition(reticle.matrix)
+    arApp.scene.add(model)
+    console.log(arApp.scene.children)
+  })
+}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (routeSelect);
+
+
+
+
 
 /***/ })
 /******/ 	]);
@@ -55129,12 +55172,14 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5);
 /* harmony import */ var _components_ARButton__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var _helpers_initARApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
 /* harmony import */ var _components_reticle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
 /* harmony import */ var _helpers_animate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(12);
+/* harmony import */ var _helpers_onSelectController__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(13);
+
 
 
 
@@ -55149,7 +55194,7 @@ const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_2__.initARApp)()
 
 arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"])
 
-const selectRay = new three__WEBPACK_IMPORTED_MODULE_5__.Raycaster()
+const selectRay = new three__WEBPACK_IMPORTED_MODULE_6__.Raycaster()
 
 function checkIntersections(origin, direction) {
   // console.log('looking for intersection')
@@ -55157,27 +55202,30 @@ function checkIntersections(origin, direction) {
   const intersects = selectRay.intersectObjects(arApp.scene.children)
   // const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
   if (intersects[0]) {
-    let intersection = intersects[0]
+    let intersection = intersects[0].object
     console.log('intersections found', intersection)
-    intersection.object.material.color.set(0xffffff * Math.random())
-    arApp.selectedObject = intersection
-  } else { arApp.selectedObject = null }
+    // intersection.object.material.color.set(0xffffff * Math.random())
+
+    return intersection
+  }
   // arApp.scene.add(arrowHelper)
+  return null
 }
 
-function placeModel(name) {
-  let model = arApp.scene.getObjectByName(name)
-  if (_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].visible) {
-    model.position.setFromMatrixPosition(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].matrix)
-    model.visible = true
-  }
-}
+// function placeModel(model) {
+//   let model = arApp.scene.getObjectByName(name)
+//   if (reticle.visible) {
+//     model.position.setFromMatrixPosition(reticle.matrix)
+//     model.visible = true
+//   }
+// }
 
 function onSelectController(event) {
-  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
-  const cameraPosition = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3().setFromMatrixPosition(arApp.camera.matrixWorld)
+  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
+  const cameraPosition = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3().setFromMatrixPosition(arApp.camera.matrixWorld)
   const directionFromCamera = touchOrigin.clone().sub(cameraPosition).normalize()
-  checkIntersections(touchOrigin, directionFromCamera)
+  const intersection = checkIntersections(touchOrigin, directionFromCamera)
+  ;(0,_helpers_onSelectController__WEBPACK_IMPORTED_MODULE_5__["default"])(arApp, intersection)
 }
 
 function renderARApp(timestamp, frame) {
@@ -55192,7 +55240,7 @@ function renderARApp(timestamp, frame) {
   }
   // arApp.hud.updateHudPosition()
   if (arApp.selectedObject) {
-    spinSelectedObject(arApp.selectedObject.object)
+    spinSelectedObject(arApp.selectedObject)
   }
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
@@ -55217,8 +55265,8 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
 
 
 function spinSelectedObject(object) {
-  object.rotateX(.2)
-  object.rotateY(.1)
+  object.rotateX(.02)
+  object.rotateY(.01)
 }
 
 

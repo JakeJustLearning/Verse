@@ -4,6 +4,7 @@ import { initHitTestSource, requestHitTestPoseMatrix, updateObjectMatrixFromHit 
 import { initARApp } from './helpers/initARApp'
 import reticle from './components/reticle'
 import animate from './helpers/animate'
+import routeSelect from './helpers/onSelectController'
 
 const container = document.createElement('div');
 document.body.appendChild(container)
@@ -20,27 +21,30 @@ function checkIntersections(origin, direction) {
   const intersects = selectRay.intersectObjects(arApp.scene.children)
   // const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
   if (intersects[0]) {
-    let intersection = intersects[0]
+    let intersection = intersects[0].object
     console.log('intersections found', intersection)
-    intersection.object.material.color.set(0xffffff * Math.random())
-    arApp.selectedObject = intersection
-  } else { arApp.selectedObject = null }
+    // intersection.object.material.color.set(0xffffff * Math.random())
+
+    return intersection
+  }
   // arApp.scene.add(arrowHelper)
+  return null
 }
 
-function placeModel(name) {
-  let model = arApp.scene.getObjectByName(name)
-  if (reticle.visible) {
-    model.position.setFromMatrixPosition(reticle.matrix)
-    model.visible = true
-  }
-}
+// function placeModel(model) {
+//   let model = arApp.scene.getObjectByName(name)
+//   if (reticle.visible) {
+//     model.position.setFromMatrixPosition(reticle.matrix)
+//     model.visible = true
+//   }
+// }
 
 function onSelectController(event) {
   const touchOrigin = new THREE.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
   const cameraPosition = new THREE.Vector3().setFromMatrixPosition(arApp.camera.matrixWorld)
   const directionFromCamera = touchOrigin.clone().sub(cameraPosition).normalize()
-  checkIntersections(touchOrigin, directionFromCamera)
+  const intersection = checkIntersections(touchOrigin, directionFromCamera)
+  routeSelect(arApp, intersection)
 }
 
 function renderARApp(timestamp, frame) {
@@ -55,7 +59,7 @@ function renderARApp(timestamp, frame) {
   }
   // arApp.hud.updateHudPosition()
   if (arApp.selectedObject) {
-    spinSelectedObject(arApp.selectedObject.object)
+    spinSelectedObject(arApp.selectedObject)
   }
   arApp.renderer.render(arApp.scene, arApp.camera)
 }
@@ -80,7 +84,7 @@ animate(arApp, renderARApp)
 
 
 function spinSelectedObject(object) {
-  object.rotateX(.2)
-  object.rotateY(.1)
+  object.rotateX(.02)
+  object.rotateY(.01)
 }
 

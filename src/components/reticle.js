@@ -6,5 +6,6 @@ const reticle = new THREE.Mesh(
 )
 reticle.matrixAutoUpdate = false
 reticle.visible = false
+reticle.name = 'reticle'
 
 export default reticle

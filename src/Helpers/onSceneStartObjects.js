@@ -4,8 +4,7 @@ import * as THREE from 'three'
 const startObjects = []
 
 // LIGHTS!
-const light = new THREE.HemisphereLight(0xffffbb, 0x080820)
-light.position.set(0.5, 1, 0.25)
+const light = new THREE.HemisphereLight(0x606060, 0x404040)
 startObjects.push(light)
 
 const directionalLight = new THREE.DirectionalLight(0xffffff)
@@ -13,7 +12,6 @@ directionalLight.position.set(0.2, 1, 1).normalize()
 startObjects.push(directionalLight)
 
 // Test Boxes
-
 
 const boxOne = new THREE.Mesh(
   new THREE.BoxGeometry(.2, .2, .2),
