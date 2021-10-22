@@ -29,9 +29,9 @@ Immersive AR features through WebXR are only available through a secure https se
 ### Real world object hit testing:
 
 the hit testing helpers is responsible for detecting real world planes both horizontal and verticle. It then is able to translate the orientation and positioning of that to the reticle object ring. As well as provide that information to allow for the placement of a model at the hit.
-![plane detection demo](https://github.com/JakeJustLearning/Lizard/tree/main/src/assets/planeDetection.gif)
+![plane detection demo](https://github.com/JakeJustLearning/Lizard/blob/main/src/assets/demoGifs/planeDetection.gif)
 
 ### Digital object selection
 
 The ability to allow users to ituitively interact with digital obkects. We need to understand from the users input on their screen where they are trying to extend their reach into the digital world. The WebXR uses raycasting in combination with some spacial math to understand the relationship between your touch, the camera's view, and the XRcontroller(mobile device) to position the ray and detect intersections with digital objects.
-![plane detection demo](https://github.com/JakeJustLearning/Lizard/tree/main/src/assets/touchInteraction.gif)
+![plane detection demo](https://github.com/JakeJustLearning/Lizard/tree/main/src/assets/demoGifs/touchInteraction.gif)
