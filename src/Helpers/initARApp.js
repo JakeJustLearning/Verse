@@ -34,15 +34,9 @@ export function initARApp() {
 
   arApp.assets = [
     { name: 'wolf', path: '../src/assets/wolf_gltf/Wolf-Blender-2.82a.gltf' },
-    // { name: 'creeper', path: '/assets/creeper/Creeper.glb' },
-    // { name: 'badIdea', path: '/assets/badIdea/PM_Idea_glb/PM_Baked_idea_4-21-20_05.glb' }
   ]
 
   arApp.hud = createHudButtons(arApp)
-
-  //path has to be from perspective of /comp/main because of web pack
-  // How to we make this relative so we can still use the correct path?
-  // loadGLTF('/assets/wolf_gltf/Wolf-Blender-2.82a.gltf', 'wolf', arApp.scene)
 
   return arApp
 }

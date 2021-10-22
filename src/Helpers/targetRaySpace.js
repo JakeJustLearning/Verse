@@ -1,11 +1,4 @@
-// help get target ray space information to be used for three.js rayscanner and intersection detection
-// Must be placed on an XRSession event inorder to get the necessary information!
-
 export function getTargetRayPose(frame, session, targetRaySpace) {
-  // const viewerRefSpace = session ?
-  // // session.requestReferenceSpace('viewer') :
-  // const viewerRefSpace =  frame.session.requestReferenceSpace('viewer')
-  // return viewerRefSpace
   return (
     frame.getPose(targetRaySpace, frame.session.requestReferenceSpace('viewer'))
   )

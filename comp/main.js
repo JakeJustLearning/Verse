@@ -240,7 +240,6 @@ function getHitTestResults(time, frame, session) {
   if (session.hitTestSource) return frame.getHitTestResults(session.hitTestSource)
 }
 
-//returns the hitTestResultPose's transform Matrix as an Array for use in setting position of other objects`
 function requestHitTestPoseMatrix(time, frame, session, renderer) {
   if (session.hitTestSource) {
     const hitTestResults = getHitTestResults(time, frame, session)
@@ -305,15 +304,9 @@ function initARApp() {
 
   arApp.assets = [
     { name: 'wolf', path: '../src/assets/wolf_gltf/Wolf-Blender-2.82a.gltf' },
-    // { name: 'creeper', path: '/assets/creeper/Creeper.glb' },
-    // { name: 'badIdea', path: '/assets/badIdea/PM_Idea_glb/PM_Baked_idea_4-21-20_05.glb' }
   ]
 
   arApp.hud = (0,_components_hud__WEBPACK_IMPORTED_MODULE_4__.createHudButtons)(arApp)
-
-  //path has to be from perspective of /comp/main because of web pack
-  // How to we make this relative so we can still use the correct path?
-  // loadGLTF('/assets/wolf_gltf/Wolf-Blender-2.82a.gltf', 'wolf', arApp.scene)
 
   return arApp
 }
@@ -54978,12 +54971,6 @@ __webpack_require__.r(__webpack_exports__);
 function createHudButtons(arApp) {
   const scaleFactor = .1
   const hud = {}
-  // buttonGroupHud.position.set(0, 0, -.35)
-
-  // hud.updateHudPosition = () => {
-  //   buttonGroupHud.position.applyMatrix4(arApp.camera.matrixWorld)
-  //   buttonGroupHud.quaternion.setFromRotationMatrix(arApp.camera.matrixWorld)
-  // }
 
   arApp.assets.forEach(asset => {
     createModelButton(asset.path, asset.name, arApp.scene, scaleFactor)
@@ -54993,14 +54980,12 @@ function createHudButtons(arApp) {
 
 function createModelButton(path, name, buttonGroup, scaleFactor) {
   console.log(path, name)
-  // const outerButtonBox = new THREE.Box3
   function onButtonModelLoad(model) {
     console.log(model)
     const scaledModel = scaleModelToButton(model.scene.children[0], scaleFactor)
     scaledModel.cloneGLTF = (onLoad) => {
       ;(0,_components_loader__WEBPACK_IMPORTED_MODULE_0__.loadGLTF)(path, name, onLoad)
     }
-    // outerButtonBox.setFromObject(scaledModel)
     buttonGroup.add(scaledModel)
     scaledModel.name = name
     scaledModel.visible = true
@@ -55023,18 +55008,14 @@ function scaleModelToButton(model, scaleFactor) {
   dif.x > dif.y ? dif.high = 'x' : dif.high = 'y'
   model.userData.scaled = dif[dif.high] * scaleFactor
   model.scale.set(model.userData.scaled, model.userData.scaled, model.userData.scaled)
-  // const bbox = new THREE.Box3().setFromObject(model)
   const mesh = new three__WEBPACK_IMPORTED_MODULE_1__.Mesh(
     new three__WEBPACK_IMPORTED_MODULE_1__.BoxGeometry(.05, .05, .05)
-    // new THREE.MeshBasicMaterial({ color: 'green', opacity: 0.0 })
   )
   mesh.position.setFromMatrixPosition(model.matrixWorld)
-  // mesh.material.visible = false
   mesh.material.wireframe = true
   mesh.add(model)
   model.translateY(-.025)
   mesh.userData.isPlaceable = true
-  // model.geometry.computeBoundingBox()
   return mesh
 }
 
@@ -55191,61 +55172,48 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const container = document.createElement('div');
-document.body.appendChild(container)
+document.body.appendChild(container);
 
-const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_2__.initARApp)()
+const arApp = (0,_helpers_initARApp__WEBPACK_IMPORTED_MODULE_2__.initARApp)();
 
-arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"])
+arApp.scene.add(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"]);
 
-const selectRay = new three__WEBPACK_IMPORTED_MODULE_6__.Raycaster()
+const selectRay = new three__WEBPACK_IMPORTED_MODULE_6__.Raycaster();
 
 function checkIntersections(origin, direction) {
-  // console.log('looking for intersection')
-  selectRay.set(origin, direction)
-  const intersects = selectRay.intersectObjects(arApp.scene.children)
-  // const arrowHelper = new THREE.ArrowHelper(direction, origin, 1, 0xffff00)
+  selectRay.set(origin, direction);
+  const intersects = selectRay.intersectObjects(arApp.scene.children);
   if (intersects[0]) {
-    let intersection = intersects[0].object
-    console.log('intersections found', intersection)
-    intersection.material.color.set(0xffffff * Math.random())
-
-    return intersection
+    let intersection = intersects[0].object;
+    console.log('intersections found', intersection);
+    intersection.material.color.set(0xffffff * Math.random());
+    return intersection;
   }
-  // arApp.scene.add(arrowHelper)
-  return null
+  return null;
 }
 
-// function placeModel(model) {
-//   let model = arApp.scene.getObjectByName(name)
-//   if (reticle.visible) {
-//     model.position.setFromMatrixPosition(reticle.matrix)
-//     model.visible = true
-//   }
-// }
-
 function onSelectController(event) {
-  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld)
-  const cameraPosition = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3().setFromMatrixPosition(arApp.camera.matrixWorld)
-  const directionFromCamera = touchOrigin.clone().sub(cameraPosition).normalize()
-  const intersection = checkIntersections(touchOrigin, directionFromCamera)
-  ;(0,_helpers_onSelectController__WEBPACK_IMPORTED_MODULE_5__["default"])(arApp, intersection)
+  const touchOrigin = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3().setFromMatrixPosition(arApp.controller.matrixWorld);
+  const cameraPosition = new three__WEBPACK_IMPORTED_MODULE_6__.Vector3().setFromMatrixPosition(arApp.camera.matrixWorld);
+  const directionFromCamera = touchOrigin.clone().sub(cameraPosition).normalize();
+  const intersection = checkIntersections(touchOrigin, directionFromCamera);
+  (0,_helpers_onSelectController__WEBPACK_IMPORTED_MODULE_5__["default"])(arApp, intersection);
 }
 
 function renderARApp(timestamp, frame) {
   if (frame && arApp.session) {
-    const hitPoseMatrix = (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.requestHitTestPoseMatrix)(timestamp, frame, arApp.session, arApp.renderer)
+    const hitPoseMatrix = (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.requestHitTestPoseMatrix)(timestamp, frame, arApp.session, arApp.renderer);
     if (hitPoseMatrix) {
-      (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.updateObjectMatrixFromHit)(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"], hitPoseMatrix)
-      _components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].visible = true
+      (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.updateObjectMatrixFromHit)(_components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"], hitPoseMatrix);
+      _components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].visible = true;
     } else {
-      _components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].visible = false
+      _components_reticle__WEBPACK_IMPORTED_MODULE_3__["default"].visible = false;
     }
   }
-  // arApp.hud.updateHudPosition()
   if (arApp.selectedObject) {
-    spinSelectedObject(arApp.selectedObject)
+    spinSelectedObject(arApp.selectedObject);
   }
-  arApp.renderer.render(arApp.scene, arApp.camera)
+  arApp.renderer.render(arApp.scene, arApp.camera);
 }
 
 document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARButton.createButton(arApp.renderer, {
@@ -55253,23 +55221,22 @@ document.body.appendChild(_components_ARButton__WEBPACK_IMPORTED_MODULE_0__.ARBu
     root: document.body
   },
   onStartCallback: async (session) => {
-    arApp.session = session
-    await (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.initHitTestSource)(arApp.session)
-    container.appendChild(arApp.renderer.domElement)
-    arApp.controller = arApp.renderer.xr.getController(0)
+    arApp.session = session;
+    await (0,_helpers_hitTest__WEBPACK_IMPORTED_MODULE_1__.initHitTestSource)(arApp.session);
+    container.appendChild(arApp.renderer.domElement);
+    arApp.controller = arApp.renderer.xr.getController(0);
     arApp.controller.addEventListener('select', (e) => {
-      onSelectController(e)
-      // placeModel('wolf')
-    })
+      onSelectController(e);
+    });
   },
-}))
+}));
 
-;(0,_helpers_animate__WEBPACK_IMPORTED_MODULE_4__["default"])(arApp, renderARApp)
+(0,_helpers_animate__WEBPACK_IMPORTED_MODULE_4__["default"])(arApp, renderARApp);
 
 
 function spinSelectedObject(object) {
-  object.rotateX(.02)
-  object.rotateY(.01)
+  object.rotateX(.02);
+  object.rotateY(.01);
 }
 
 

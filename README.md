@@ -1,31 +1,37 @@
+# Lizard: in Browser AR
 
-```markdown
-Syntax highlighted code block
+## Summary
 
-# Header 1
-## Header 2
-### Header 3
+This demo shows off some of the features available for in browser immersive AR experiences. As we move toward metaverse interactions we will need to be able to intuitively interact with the digital world, and accurately overlay the digital world with the physical one. In this way we can provide a consistant metaverse experience and make digital interaction more "real" and physical.
 
+## Install
 
-- List
+download the repo to local and install dependencies through npm or yarn.
 
-1. Numbered
-2. List
+## local running and use
 
-**Bold** and _Italic_ and `Code` text
+WebXR is an experimental web standard and therefore requires special set up to run and test locally.
 
-[Link](url) and ![Image](src)
-```
+### HTTPS:
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Immersive AR features through WebXR are only available through a secure https server. in VScode [live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) can be used to set up an https local server. You can also use [mkcert](https://github.com/FiloSottile/mkcert) to create a localhost certificates to run https.
 
-### Jekyll Themes
+### Veiwing WebXR Content
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/JakeJustLearning/Lizard/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+**In Browser** Immersive AR content can be viewed in the browser with the use of [WebXR API Emulator](https://chrome.google.com/webstore/detail/webxr-api-emulator/mjddjgeghkdijejnciaefnkjmkafnnje?hl=en#:~:text=WebXR%20Emulator%20extension%20enables%20users,with%20their%20controllers%20to%20emulate.) for google chrome.
 
-### Support or Contact
+**On Android:** Android devices can use the latest version of chrome to access a locally hosted instance and view webXR content if the device is on the same network as the hosting device.
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+**On iOS:** Safari does not natively support webXR content. One must download [WebXR Veiwer browser](https://apps.apple.com/us/app/webxr-viewer/id1295998056) from amzaon. As well webXR Veiwer does not play well with locally hosted HTTPS instances. However the application can be easily deployed through github pages, or any other hosting service and then accessed. This project is set up to use github pages out of the box.
 
+## Features and demonstrations
 
+### Real world object hit testing:
 
+the hit testing helpers is responsible for detecting real world planes both horizontal and verticle. It then is able to translate the orientation and positioning of that to the reticle object ring. As well as provide that information to allow for the placement of a model at the hit.
+![plane detection demo](https://github.com/JakeJustLearning/Lizard/tree/main/src/assets/planeDetection.gif)
+
+### Digital object selection
+
+The ability to allow users to ituitively interact with digital obkects. We need to understand from the users input on their screen where they are trying to extend their reach into the digital world. The WebXR uses raycasting in combination with some spacial math to understand the relationship between your touch, the camera's view, and the XRcontroller(mobile device) to position the ray and detect intersections with digital objects.
+![plane detection demo](https://github.com/JakeJustLearning/Lizard/tree/main/src/assets/touchInteraction.gif)
