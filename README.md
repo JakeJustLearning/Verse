@@ -34,4 +34,4 @@ the hit testing helpers is responsible for detecting real world planes both hori
 ### Digital object selection
 
 The ability to allow users to ituitively interact with digital obkects. We need to understand from the users input on their screen where they are trying to extend their reach into the digital world. The WebXR uses raycasting in combination with some spacial math to understand the relationship between your touch, the camera's view, and the XRcontroller(mobile device) to position the ray and detect intersections with digital objects.
-![plane detection demo](https://github.com/JakeJustLearning/Lizard/tree/main/src/assets/demoGifs/touchInteraction.gif)
+![plane detection demo](https://github.com/JakeJustLearning/Lizard/blob/main/src/assets/demoGifs/touchInteraction.gif)
