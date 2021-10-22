@@ -1,4 +1,5 @@
 # Lizard: in Browser AR
+**[Go to Deployed Demo](https://jakejustlearning.github.io/Lizard/src/index.html)**
 
 ## Summary
 
