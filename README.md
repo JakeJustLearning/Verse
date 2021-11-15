@@ -1,5 +1,5 @@
 # Verse: in Browser AR
-**[Go to Deployed Demo](https://jakejustlearning.github.io/Lizard/src/index.html)**
+**[Go to Deployed Demo](https://jakejustlearning.github.io/Verse/src/index.html)**
 
 ## Summary
 
